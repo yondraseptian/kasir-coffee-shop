@@ -1,30 +1,28 @@
+"use client";
+import { AlertMessage } from '@/components/alert-message';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
+import { PageProps } from '@/types/inertia';
 import { Inertia } from '@inertiajs/inertia';
+import { usePage } from '@inertiajs/react';
 import { Label } from '@radix-ui/react-label';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
-const breadcrumbs: BreadcrumbItem[] = [
-    {
-        title: 'ingredients',
-        href: '/ingredients',
-    },
-    {
-        title: 'create',
-        href: '/ingredients/create',
-    },
-];
-
-// interface ingredient {
-//     id: number;
-//     name: string;
-//     quantity: number;
-//     unit_id: number;
-// }
+interface Ingredient {
+    id: number;
+    name: string;
+    stock: number;
+    unit_id: number;
+    unit: {
+        id: number;
+        name: string;
+        abbreviation: string;
+    };
+}
 
 interface Unit {
     id: number;
@@ -32,20 +30,41 @@ interface Unit {
     abbreviation: string;
 }
 
-export default function IngredientCreateForm( { units = [] }: { units: Unit[] } ) {
-    const [formData, setFormData] = useState({
-        name: '',
-        stock: '',
-        unit_id: '',
-    });
+interface IngredientEditFormProps {
+    ingredient: Ingredient;
+    units: Unit[];
+}
 
-    const handleSubmit = (e: React.FormEvent) => {
-        e.preventDefault();
-        try {
-            Inertia.post(route('ingredients.store'), formData);
-        } catch (error) {
-            console.error(error);
+export default function IngredientEditForm({ ingredient, units }: IngredientEditFormProps) {
+    const [formData, setFormData] = useState(ingredient);
+    const { flash } = usePage<PageProps>().props;
+    const [showAlert, setShowAlert] = useState(false);
+
+    useEffect(() => {
+        if (flash?.success) {
+            setShowAlert(true);
+            const timer = setTimeout(() => setShowAlert(false), 5000);
+            return () => clearTimeout(timer);
         }
+    }, [flash]);
+
+    const handleSave = () => {
+        const formPayload = new FormData();
+        formPayload.append('name', formData.name);
+        formPayload.append('stock', formData.stock.toString());
+        formPayload.append('unit_id', formData.unit_id.toString());    
+        formPayload.append('_method', 'PUT');
+        Inertia.post(route('ingredients.update', ingredient.id), formPayload, {
+            forceFormData: true,
+            preserveState: false,
+            onSuccess: () => {
+                
+            },
+            onError: (errors) => {
+                console.error(errors);
+                alert('Update failed. Check your input.');
+            },
+        });
     };
 
     const handleInputChange = (field: string, value: string) => {
@@ -54,16 +73,28 @@ export default function IngredientCreateForm( { units = [] }: { units: Unit[] } 
             [field]: value,
         }));
     };
+    const breadcrumbs: BreadcrumbItem[] = [
+        {
+            title: 'ingredients',
+            href: '/ingredients',
+        },
+        {
+            title: ingredient.name,
+            href: '/ingredients/' + ingredient.id,
+        },
+    ];
+    console.log('page props', usePage().props);
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <div className="mx-auto w-full max-w-md mt-10">
+            {showAlert && <AlertMessage variant="success" title="Success!" description={flash.success} />}
+            <div className="mx-auto mt-10 w-full max-w-md">
                 <Card>
                     <CardHeader>
                         <CardTitle>Create New Ingredient</CardTitle>
                         <CardDescription>Add a new ingredient to your inventory</CardDescription>
                     </CardHeader>
                     <CardContent>
-                        <form onSubmit={handleSubmit} className="space-y-4">
+                        <form  onSubmit={(e) => { e.preventDefault(); handleSave() }} className="space-y-4">
                             <div className="space-y-2">
                                 <Label htmlFor="name">Name</Label>
                                 <Input
@@ -92,7 +123,7 @@ export default function IngredientCreateForm( { units = [] }: { units: Unit[] } 
 
                             <div className="space-y-2">
                                 <Label htmlFor="unit">Unit</Label>
-                                <Select value={formData.unit_id} onValueChange={(value) => handleInputChange('unit_id', value)}>
+                                <Select value={formData.unit_id.toString()} onValueChange={(value) => handleInputChange('unit_id', value)}>
                                     <SelectTrigger>
                                         <SelectValue placeholder="Select unit" />
                                     </SelectTrigger>

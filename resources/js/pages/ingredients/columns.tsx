@@ -1,6 +1,7 @@
 'use client';
 
 import { Button } from '@/components/ui/button';
+import { Inertia } from '@inertiajs/inertia';
 import { ColumnDef } from '@tanstack/react-table';
 
 // This type is used to define the shape of our data.
@@ -10,11 +11,12 @@ export type Ingredient = {
     id: string;
     name: string;
     quantity: number;
+    unit_id: number;
     unit: string;
 };
 
 const handleEdit = (Ingredients: Ingredient) => {
-    console.log(Ingredients);
+    Inertia.get(`/ingredients/${Ingredients.id}/edit`);
 };
 
 const handleDelete = (Ingredients: Ingredient) => {
@@ -30,7 +32,7 @@ export const columns: ColumnDef<Ingredient>[] = [
     },
     {
         accessorKey: 'stock',
-        header: 'Quantity',
+        header: 'Stock',
     },
     {
         accessorKey: 'unit',

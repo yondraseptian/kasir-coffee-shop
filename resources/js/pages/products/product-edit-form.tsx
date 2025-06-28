@@ -224,7 +224,7 @@ export default function ProductEditForm({
         formData.append('price', product.price.toString());
 
         // Hanya kirim file image jika file yang baru dipilih (bukan string URL)
-        if (product.image?.file) {
+        if (product.image && product.image.file instanceof File) {
             formData.append('image', product.image.file);
         }
 
@@ -268,7 +268,7 @@ export default function ProductEditForm({
                         <h1 className="text-3xl font-bold">Edit Product</h1>
                         <p className="text-muted-foreground">Update product information and ingredients</p>
                     </div>
-                    <Button onClick={handleSave} className="flex items-center gap-2">
+                    <Button type='button' onClick={handleSave} className="flex items-center gap-2">
                         <Save className="h-4 w-4" />
                         Save Changes
                     </Button>
@@ -449,7 +449,7 @@ export default function ProductEditForm({
                                         <div className="flex items-center gap-2 rounded-lg border p-3">
                                             <div className="flex-1">
                                                 <div className="font-medium">{ingredient.name}</div>
-                                                <div className="text-sm text-muted-foreground">Unit: {ingredient.unit}</div>
+                                                <div className="text-sm text-muted-foreground">Unit: {ingredient.Unit.name}</div>
                                             </div>
                                             <div className="flex items-center gap-2">
                                                 <Input
@@ -464,13 +464,13 @@ export default function ProductEditForm({
                                                     value={ingredient.unit_id ? ingredient.unit_id.toString() : ''}
                                                     onValueChange={(value) => handleIngredientChange(index, 'unit_id', parseInt(value))}
                                                 >
-                                                    <SelectTrigger className="w-28">
+                                                    <SelectTrigger className="w-16">
                                                         <SelectValue placeholder="Select unit" />
                                                     </SelectTrigger>
                                                     <SelectContent>
                                                         {units.map((unit) => (
                                                             <SelectItem key={unit.id} value={unit.id.toString()}>
-                                                                {unit.name} ({unit.abbreviation})
+                                                                {unit.abbreviation}
                                                             </SelectItem>
                                                         ))}
                                                     </SelectContent>
