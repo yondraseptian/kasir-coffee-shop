@@ -1,7 +1,7 @@
 'use client';
 
 import { Button } from '@/components/ui/button';
-import { Inertia } from '@inertiajs/inertia';
+import { Link, router } from '@inertiajs/react';
 import { ColumnDef } from '@tanstack/react-table';
 
 // This type is used to define the shape of our data.
@@ -15,13 +15,9 @@ export type Ingredient = {
     unit: string;
 };
 
-const handleEdit = (Ingredients: Ingredient) => {
-    Inertia.get(`/ingredients/${Ingredients.id}/edit`);
-};
-
 const handleDelete = (Ingredients: Ingredient) => {
     if (confirm('Are you sure you want to delete this product?')) {
-        console.log(Ingredients);
+        router.delete(`/ingredients/${Ingredients.id}`);
     }                                                                       
 };
 
@@ -44,9 +40,11 @@ export const columns: ColumnDef<Ingredient>[] = [
         cell: ({ row }) => {
             return (
                 <div className="flex gap-2">
-                    <Button onClick={() => handleEdit(row.original)} variant="outline" className="cursor-pointer">
+                    <Link href={`/ingredients/${row.original.id}/edit`}>
+                    <Button variant="outline" className="cursor-pointer">
                         Edit
                     </Button>
+                    </Link>
                     <Button onClick={() => handleDelete(row.original)} variant="destructive" className="cursor-pointer">
                         Delete
                     </Button>

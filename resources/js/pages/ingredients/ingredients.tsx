@@ -48,7 +48,7 @@ export default function Stocks({ ingredients }: { ingredients: Ingredient[] }) {
 
             <div className="space-y-6 p-4">
                 {/* Header Section */}
-                {showAlert && <AlertMessage variant="success" title="Success!" description={flash.success} />}
+                {showAlert && <AlertMessage variant="success" title="Success!" description={flash.success ?? ''} />}
 
                 <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
                     <div className="space-y-1">
