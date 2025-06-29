@@ -4,9 +4,8 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
-import { Inertia } from '@inertiajs/inertia';
+import { useForm } from '@inertiajs/react';
 import { Label } from '@radix-ui/react-label';
-import { useState } from 'react';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -33,23 +32,19 @@ interface Unit {
 }
 
 export default function IngredientCreateForm( { units = [] }: { units: Unit[] } ) {
-    const [formData, setFormData] = useState({
+    const {data, setData, errors, post, processing} = useForm({
         name: '',
         stock: '',
         unit_id: '',
     });
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        try {
-            Inertia.post(route('ingredients.store'), formData);
-        } catch (error) {
-            console.error(error);
-        }
+        post(route('ingredients.store'));
     };
 
     const handleInputChange = (field: string, value: string) => {
-        setFormData((prev) => ({
+        setData((prev) => ({
             ...prev,
             [field]: value,
         }));
@@ -70,10 +65,11 @@ export default function IngredientCreateForm( { units = [] }: { units: Unit[] } 
                                     id="name"
                                     type="text"
                                     placeholder="Enter ingredient name"
-                                    value={formData.name}
+                                    value={data.name}
                                     onChange={(e) => handleInputChange('name', e.target.value)}
                                     required
                                 />
+                                {errors.name && <p className="text-red-500">{errors.name}</p>}
                             </div>
 
                             <div className="space-y-2">
@@ -82,17 +78,18 @@ export default function IngredientCreateForm( { units = [] }: { units: Unit[] } 
                                     id="stock"
                                     type="number"
                                     placeholder="Enter stock quantity"
-                                    value={formData.stock}
+                                    value={data.stock}
                                     onChange={(e) => handleInputChange('stock', e.target.value)}
                                     min="0"
                                     step="0.01"
                                     required
                                 />
+                                {errors.stock && <p className="text-red-500">{errors.stock}</p>}
                             </div>
 
                             <div className="space-y-2">
                                 <Label htmlFor="unit">Unit</Label>
-                                <Select value={formData.unit_id} onValueChange={(value) => handleInputChange('unit_id', value)}>
+                                <Select value={data.unit_id} onValueChange={(value) => handleInputChange('unit_id', value)}>
                                     <SelectTrigger>
                                         <SelectValue placeholder="Select unit" />
                                     </SelectTrigger>
@@ -104,10 +101,11 @@ export default function IngredientCreateForm( { units = [] }: { units: Unit[] } 
                                         ))}
                                     </SelectContent>
                                 </Select>
+                                {errors.unit_id && <p className="text-red-500">{errors.unit_id}</p>}
                             </div>
 
                             <Button type="submit" className="w-full">
-                                Create Ingredient
+                                {processing ? 'Saving...' : 'Save'}
                             </Button>
                         </form>
                     </CardContent>

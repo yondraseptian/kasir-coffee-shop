@@ -92,4 +92,11 @@ class IngredientController extends Controller
 
         return redirect()->route('ingredients.edit', $ingredient->id)->with('success', 'Ingredient updated successfully!')->with('debug', 'flash shold be visible now');
     }
+
+    public function destroy($id)
+    {
+        $ingredient = Ingredient::findOrFail($id);
+        $ingredient->delete();
+        return redirect()->route('ingredients')->with('success', 'Ingredient deleted successfully!');
+    }
 }
