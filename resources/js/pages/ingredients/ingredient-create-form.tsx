@@ -18,13 +18,6 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-// interface ingredient {
-//     id: number;
-//     name: string;
-//     quantity: number;
-//     unit_id: number;
-// }
-
 interface Unit {
     id: number;
     name: string;

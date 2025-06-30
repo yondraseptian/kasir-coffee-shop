@@ -1,52 +1,68 @@
-"use client"
+'use client';
 
-import { DataTable } from "@/components/data-table"
-import AppLayout from "@/layouts/app-layout"
-import type { BreadcrumbItem } from "@/types"
-import { Head, Link } from "@inertiajs/react"
-import { useEffect, useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Plus, Package } from "lucide-react"
-import { columns, Product } from "./columns"
+import { DataTable } from '@/components/data-table';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import AppLayout from '@/layouts/app-layout';
+import type { BreadcrumbItem } from '@/types';
+import { PageProps } from '@/types/inertia';
+import { Head, Link, usePage } from '@inertiajs/react';
+import { Package, Plus } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { columns, Product } from './columns';
+import { AlertMessage } from '@/components/alert-message';
 
 const breadcrumbs: BreadcrumbItem[] = [
-  {
-    title: "Products",
-    href: "/products",
-  },
-]
+    {
+        title: 'Products',
+        href: '/products',
+    },
+];
 
 export default function Products({ products }: { products: Product[] }) {
-  const [data, setData] = useState<Product[]>(products)
+    const [data, setData] = useState<Product[]>(products);
+    const [showAlert, setShowAlert] = useState(false);
+    const { flash } = usePage<PageProps>().props;
 
-  useEffect(() => {
-    setData(products)
-  }, [products])
+    useEffect(() => {
+        if (flash?.success) {
+            setShowAlert(true);
 
-  return (
-    <AppLayout breadcrumbs={breadcrumbs}>
-      <Head title="Products" />
+            // Sembunyikan alert otomatis setelah beberapa detik (opsional)
+            const timer = setTimeout(() => setShowAlert(false), 5000);
+            return () => clearTimeout(timer);
+        }
+    }, [flash]);
 
-      <div className="space-y-6 p-4">
-        {/* Header Section */}
-        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-          <div className="space-y-1">
-            <div className="flex items-center gap-2">
-              <Package className="h-6 w-6 text-muted-foreground" />
-              <h1 className="text-3xl font-bold tracking-tight">Products</h1>
-            </div>
-            <p className="text-muted-foreground">Manage your product inventory and catalog</p>
-          </div>
-          <Link href="/products/create">
-          <Button className="gap-2">
-            <Plus className="h-4 w-4" />
-            Create Product
-          </Button>
-          </Link>
-        </div>
+    useEffect(() => {
+        setData(products);
+    }, [products]);
 
-        {/* Stats Cards
+    return (
+        <AppLayout breadcrumbs={breadcrumbs}>
+            <Head title="Products" />
+
+            <div className="space-y-6 p-4">
+                {/* Header Section */}
+                {showAlert && <AlertMessage variant="success" title="Success!" description={flash.success ?? ''} />}
+
+                <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+                    <div className="space-y-1">
+                        <div className="flex items-center gap-2">
+                            <Package className="h-6 w-6 text-muted-foreground" />
+                            <h1 className="text-3xl font-bold tracking-tight">Products</h1>
+                        </div>
+                        <p className="text-muted-foreground">Manage your product inventory and catalog</p>
+                    </div>
+                    <Link href="/products/create">
+                        <Button className="gap-2">
+                            <Plus className="h-4 w-4" />
+                            Create Product
+                        </Button>
+                    </Link>
+                </div>
+
+                {/* Stats Cards
         <div className="grid gap-4 md:grid-cols-3">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -82,17 +98,17 @@ export default function Products({ products }: { products: Product[] }) {
           </Card>
         </div> */}
 
-        {/* Data Table */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Product Catalog</CardTitle>
-            <CardDescription>View and manage all your products in one place</CardDescription>
-          </CardHeader>
-          <CardContent className="p-4">
-            <DataTable columns={columns} data={data} />
-          </CardContent>
-        </Card>
-      </div>
-    </AppLayout>
-  )
+                {/* Data Table */}
+                <Card>
+                    <CardHeader>
+                        <CardTitle>Product Catalog</CardTitle>
+                        <CardDescription>View and manage all your products in one place</CardDescription>
+                    </CardHeader>
+                    <CardContent className="p-4">
+                        <DataTable columns={columns} data={data} />
+                    </CardContent>
+                </Card>
+            </div>
+        </AppLayout>
+    );
 }

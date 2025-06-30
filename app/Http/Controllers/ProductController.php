@@ -107,7 +107,7 @@ class ProductController extends Controller
             'name' => 'required|string|max:255',
             'price' => 'required|numeric',
             'category_id' => 'required|exists:categories,id',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:10240',
             'ingredients' => 'required|array',
             'ingredients.*.ingredient_id' => 'required|exists:ingredients,id',
             'ingredients.*.quantity' => 'required|numeric',
@@ -139,7 +139,7 @@ class ProductController extends Controller
 
         $product->ingredients()->sync($ingredients);
 
-        return redirect()->route('products.create')->with('success', 'Product created successfully!');
+        return redirect()->route('products')->with('success', 'Product created successfully!');
     }
 
     // Menyimpan kategori baru
@@ -199,7 +199,7 @@ class ProductController extends Controller
 
         $product->ingredients()->sync($ingredients);
 
-        return redirect()->route('products.edit', ['id' => $id])->with('success', 'Product updated successfully!')->with('success', 'Product updated successfully!');
+        return redirect()->route('products')->with('success', 'Product updated successfully!')->with('success', 'Product updated successfully!');
     }
 
 

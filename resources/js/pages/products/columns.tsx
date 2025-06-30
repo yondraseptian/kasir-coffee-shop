@@ -1,8 +1,7 @@
 'use client';
 
 import { Button } from '@/components/ui/button';
-import { Inertia } from '@inertiajs/inertia';
-import { Link } from '@inertiajs/react';
+import { Link, router } from '@inertiajs/react';
 import { ColumnDef } from '@tanstack/react-table';
 
 // This type is used to define the shape of our data.
@@ -25,15 +24,7 @@ export type Product = {
 
 const handleDelete = (product: Product) => {
     if (confirm(`Are you sure you want to delete "${product.name}"?`)) {
-        Inertia.delete(route('products.destroy', product.id), {
-            onSuccess: () => {
-                alert('Product deleted successfully');
-            },
-            onError: (errors) => {
-                console.error(errors);
-                alert('Failed to delete the product.');
-            },
-        });
+        router.delete(`/products/${product.id}`);
     }
 };
 
