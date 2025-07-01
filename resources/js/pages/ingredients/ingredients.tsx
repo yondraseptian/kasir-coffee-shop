@@ -19,7 +19,7 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-export default function Stocks({ ingredients }: { ingredients: Ingredient[] }) {
+export default function Ingredient({ ingredients }: { ingredients: Ingredient[] }) {
     const [data, setData] = useState<Ingredient[]>(ingredients);
     const { flash } = usePage<PageProps>().props;
     const [showAlert, setShowAlert] = useState(false);

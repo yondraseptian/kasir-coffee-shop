@@ -29,6 +29,7 @@ class DatabaseSeeder extends Seeder
             UnitConversionSeeder::class,
             IngredientsTableSeeder::class,
             ProductIngredientTableSeeder::class,
+            TransactionSeeder::class
         ]);
     }
 }

@@ -38,7 +38,7 @@ class ProductController extends Controller
             ];
         });
 
-        return inertia('products/products', [
+        return inertia('products/index', [
             'products' => $products,
         ]);
     }
@@ -48,7 +48,7 @@ class ProductController extends Controller
 
     public function create()
     {
-        return Inertia::render('products/product-create-form', [
+        return Inertia::render('products/create', [
             'categories' => Category::all()->toArray(),
             'ingredients' => Ingredient::with('unit')->get()->toArray(),
             'units' => Unit::all()->toArray(),
@@ -93,7 +93,7 @@ class ProductController extends Controller
             ]
             : null;
 
-        return Inertia::render('products/product-edit-form', [
+        return Inertia::render('products/edit', [
             'product' => $productData,
             'categories' => Category::all()->toArray(),
             'ingredients' => Ingredient::with('unit')->get()->toArray(),
@@ -151,7 +151,7 @@ class ProductController extends Controller
 
         $category = Category::create(['name' => $request->name]);
 
-        return Inertia::render('products/product-create-form', [
+        return Inertia::render('products/create', [
             'categories' => Category::all()->toArray(),
             'ingredients' => Ingredient::all()->toArray(),
         ]);

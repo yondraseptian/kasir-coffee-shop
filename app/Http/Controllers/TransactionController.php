@@ -2,31 +2,57 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Product;
 use App\Models\Transaction;
-use App\Models\TransactionDetail;
 use Illuminate\Http\Request;
 
 class TransactionController extends Controller
 {
-    public function index(){
-        return Transaction::with('transactionDetails.drink')->get();
+    public function index()
+    {
+        // Ambil semua transaksi beserta detail dan produk dari setiap detail
+        $transactions = Transaction::with(['user', 'transactionDetails.product'])
+            ->get()
+            ->map(function ($transaction) {
+                return [
+                    'transaction_id' => $transaction->id,
+                    'user_name' => $transaction->user->name,
+                    'details' => $transaction->transactionDetails->map(function ($detail) {
+                        return [
+                            'product_name' => $detail->product->name,
+                            'quantity' => $detail->quantity,
+                            'price' => $detail->product->price,
+                            'total_price' => $detail->quantity * $detail->product->price,
+                        ];
+                    }),
+                ];
+            });
+
+        return inertia('transactions/transactions', [
+            'transactions' => $transactions,
+        ]);
     }
 
-    public function store(Request $request){
-        $transaction = Transaction::create (request()->only([
-            'user_id',
-            'total_price',
-        ]));
+    public function details($id)
+    {
+        $transaction = Transaction::with(['user', 'transactionDetails.product'])->findOrFail($id);
 
-        foreach($request->transactionDetails as $transactionDetail){
-            TransactionDetail::create([
-                'transaction_id' => $transaction->id,
-                'drink_id' => $transactionDetail['drink_id'],
-                'quantity' => $transactionDetail['quantity'],
-                'total_price' => $transactionDetail['total_price'],
-            ]);
-        }
-
-        return response()->json($transaction, 201);
+        return inertia('transactions/transaction-view', [
+            'transaction' => [
+                'id' => $transaction->id,
+                'user_name' => $transaction->user->name,
+                'payment_method' => $transaction->payment_method,
+                'total_price' => $transaction->total_price,
+                'created_at' => $transaction->created_at,
+                'details' => $transaction->transactionDetails->map(function ($detail) {
+                    return [
+                        'product_name' => $detail->product->name,
+                        'quantity' => $detail->quantity,
+                        'price' => $detail->product->price,
+                        'total_price' => $detail->quantity * $detail->product->price,
+                    ];
+                }),
+            ],
+        ]);
     }
 }

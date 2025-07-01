@@ -490,7 +490,13 @@ const sidebarMenuButtonVariants = cva(
   }
 )
 
-function SidebarMenuButton({
+type SidebarMenuButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
+  asChild?: boolean;
+  isActive?: boolean;
+  tooltip?: string | React.ComponentProps<typeof TooltipContent>;
+} & VariantProps<typeof sidebarMenuButtonVariants>;
+
+const SidebarMenuButton = React.forwardRef<HTMLButtonElement, SidebarMenuButtonProps>(({
   asChild = false,
   isActive = false,
   variant = "default",
@@ -498,16 +504,13 @@ function SidebarMenuButton({
   tooltip,
   className,
   ...props
-}: React.ComponentProps<"button"> & {
-  asChild?: boolean
-  isActive?: boolean
-  tooltip?: string | React.ComponentProps<typeof TooltipContent>
-} & VariantProps<typeof sidebarMenuButtonVariants>) {
-  const Comp = asChild ? Slot : "button"
-  const { isMobile, state } = useSidebar()
+}, ref) => {
+  const { isMobile, state } = useSidebar();
+  const Comp = asChild ? Slot : "button";
 
   const button = (
     <Comp
+      ref={ref} // ✅ ref di sini HARUS cocok dengan HTMLButtonElement
       data-slot="sidebar-menu-button"
       data-sidebar="menu-button"
       data-size={size}
@@ -515,17 +518,11 @@ function SidebarMenuButton({
       className={cn(sidebarMenuButtonVariants({ variant, size }), className)}
       {...props}
     />
-  )
+  );
 
-  if (!tooltip) {
-    return button
-  }
+  if (!tooltip) return button;
 
-  if (typeof tooltip === "string") {
-    tooltip = {
-      children: tooltip,
-    }
-  }
+  const tooltipProps = typeof tooltip === "string" ? { children: tooltip } : tooltip;
 
   return (
     <Tooltip>
@@ -534,11 +531,11 @@ function SidebarMenuButton({
         side="right"
         align="center"
         hidden={state !== "collapsed" || isMobile}
-        {...tooltip}
+        {...tooltipProps}
       />
     </Tooltip>
-  )
-}
+  );
+});
 
 function SidebarMenuAction({
   className,

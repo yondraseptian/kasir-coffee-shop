@@ -3,6 +3,7 @@
 use App\Http\Controllers\CashierController;
 use App\Http\Controllers\IngredientController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\TransactionController;
 use App\Models\Product;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -30,6 +31,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/ingredients/{id}/edit', [IngredientController::class, 'edit'])->name('ingredients.edit');
     Route::put('/ingredients/{id}', [IngredientController::class, 'update'])->name('ingredients.update');
     Route::delete('/ingredients/{id}', [IngredientController::class, 'destroy'])->name('ingredients.destroy');
+
+    Route::get('transactions', [TransactionController::class, 'index'])->name('transactions');
+    Route::get('transactions/{id}', [TransactionController::class, 'details'])->name('transactions.details');
 
     Route::get('cashier', [CashierController::class, 'index'])->name('cashier');
 });
