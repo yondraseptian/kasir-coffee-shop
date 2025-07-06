@@ -17,7 +17,6 @@ class IngredientController extends Controller
             return [
                 'id' => $ingredient->id,
                 'name' => $ingredient->name,
-                'stock' => $ingredient->stock,
                 'unit' => $ingredient->unit->name,
                 'unit_id' => $ingredient->unit_id,
             ];
@@ -40,13 +39,11 @@ class IngredientController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
-            'stock' => 'required|numeric',
             'unit_id' => 'required|exists:units,id',
         ]);
 
         $ingredient = Ingredient::create([
             'name' => $request->name,
-            'stock' => $request->stock,
             'unit_id' => $request->unit_id,
         ]);
 
@@ -61,7 +58,6 @@ class IngredientController extends Controller
         $ingredient = [
             'id' => $ingredient->id,
             'name' => $ingredient->name,
-            'stock' => $ingredient->stock,
             'unit_id' => $ingredient->unit_id,
             'unit' => [
                 'id' => $ingredient->unit->id,
@@ -80,13 +76,11 @@ class IngredientController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
-            'stock' => 'required|numeric',
             'unit_id' => 'required|exists:units,id',
         ]);
 
         $ingredient = Ingredient::findOrFail($id);
         $ingredient->name = $request->name;
-        $ingredient->stock = $request->stock;
         $ingredient->unit_id = $request->unit_id;
         $ingredient->save();
 

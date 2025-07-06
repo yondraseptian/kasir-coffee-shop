@@ -8,7 +8,6 @@ class Ingredient extends Model
 {
     protected $fillable = [
         'name',
-        'stock',
         'unit_id',
     ];
 
