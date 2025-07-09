@@ -6,7 +6,11 @@ use Illuminate\Database\Eloquent\Model;
 
 class Transaction extends Model
 {
-    protected $table = 'transactions';
+    protected $fillable = [
+        'user_id', // ✅ Tambahkan ini
+        'payment_method',
+        'total_price',
+    ];
 
     public function user()
     {

@@ -14,8 +14,9 @@ return new class extends Migration
         Schema::create('ingredients', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->decimal('stock', 8, 2);
             $table->string('unit');
+            $table->boolean('is_out_of_stock')->default(false); // Menandakan habis atau tidak
+            $table->decimal('stock_alert_threshold', 10, 2)->default(0); // Batas minimum agar muncul peringat
             $table->timestamps();
         });
     }

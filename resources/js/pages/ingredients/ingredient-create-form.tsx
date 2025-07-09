@@ -4,6 +4,7 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
+import { Unit } from '@/types/ingredient';
 import { useForm } from '@inertiajs/react';
 import { Label } from '@radix-ui/react-label';
 
@@ -18,24 +19,13 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-// interface ingredient {
-//     id: number;
-//     name: string;
-//     quantity: number;
-//     unit_id: number;
-// }
 
-interface Unit {
-    id: number;
-    name: string;
-    abbreviation: string;
-}
 
 export default function IngredientCreateForm( { units = [] }: { units: Unit[] } ) {
     const {data, setData, errors, post, processing} = useForm({
         name: '',
-        stock: '',
         unit_id: '',
+        stock_alert_threshold:''
     });
 
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
@@ -73,18 +63,18 @@ export default function IngredientCreateForm( { units = [] }: { units: Unit[] } 
                             </div>
 
                             <div className="space-y-2">
-                                <Label htmlFor="stock">Stock</Label>
+                                <Label htmlFor="stock_alert_threshold">Stock alert threshold</Label>
                                 <Input
-                                    id="stock"
+                                    id="stock_alert_threshold"
                                     type="number"
-                                    placeholder="Enter stock quantity"
-                                    value={data.stock}
-                                    onChange={(e) => handleInputChange('stock', e.target.value)}
+                                    placeholder="Enter alert quantity"
+                                    value={data.stock_alert_threshold}
+                                    onChange={(e) => handleInputChange('stock_alert_threshold', e.target.value)}
                                     min="0"
                                     step="0.01"
                                     required
                                 />
-                                {errors.stock && <p className="text-red-500">{errors.stock}</p>}
+                                {errors.stock_alert_threshold && <p className="text-red-500">{errors.stock_alert_threshold}</p>}
                             </div>
 
                             <div className="space-y-2">

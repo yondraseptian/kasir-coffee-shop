@@ -8,7 +8,7 @@ import AppLayout from '@/layouts/app-layout';
 import { columns, type Ingredient } from '@/pages/ingredients/columns';
 import type { BreadcrumbItem } from '@/types';
 import { PageProps } from '@/types/inertia';
-import { Head, router, usePage } from '@inertiajs/react';
+import { Head, Link, router, usePage } from '@inertiajs/react';
 import { Package, Plus } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
@@ -19,7 +19,7 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-export default function Stocks({ ingredients }: { ingredients: Ingredient[] }) {
+export default function Ingredient({ ingredients }: { ingredients: Ingredient[] }) {
     const [data, setData] = useState<Ingredient[]>(ingredients);
     const { flash } = usePage<PageProps>().props;
     const [showAlert, setShowAlert] = useState(false);
@@ -58,10 +58,18 @@ export default function Stocks({ ingredients }: { ingredients: Ingredient[] }) {
                         </div>
                         <p className="text-muted-foreground">Manage your ingredient inventory and catalog</p>
                     </div>
-                    <Button onClick={handleCreateIngredient} className="gap-2">
-                        <Plus className="h-4 w-4" />
-                        Create ingredient
-                    </Button>
+                    <div className="flex gap-2">
+                        <Link href={'/ingredients/stock/create'}>
+                            <Button>
+                                <Plus className="h-4 w-4" />
+                                Add Stock
+                            </Button>
+                        </Link>
+                        <Button onClick={handleCreateIngredient} className="gap-2">
+                            <Plus className="h-4 w-4" />
+                            Create ingredient
+                        </Button>
+                    </div>
                 </div>
 
                 {/* Stats Cards */}
@@ -83,7 +91,7 @@ export default function Stocks({ ingredients }: { ingredients: Ingredient[] }) {
                             <div className="h-4 w-4 rounded-full bg-green-500" />
                         </CardHeader>
                         <CardContent>
-                            <div className="text-2xl font-bold">{data.filter((ingredient) => ingredient.stock > 0).length}</div>
+                            <div className="text-2xl font-bold">{data.filter((ingredient) => ingredient.final_stock > ingredient.stock_alert_threshold).length}</div>
                             <p className="text-xs text-muted-foreground">ingredients available</p>
                         </CardContent>
                     </Card>
@@ -94,7 +102,7 @@ export default function Stocks({ ingredients }: { ingredients: Ingredient[] }) {
                             <div className="h-4 w-4 rounded-full bg-red-500" />
                         </CardHeader>
                         <CardContent>
-                            <div className="text-2xl font-bold">{data.filter((ingredient) => ingredient.stock === 0).length}</div>
+                            <div className="text-2xl font-bold">{data.filter((ingredient) => ingredient.final_stock === ingredient.stock_alert_threshold).length}</div>
                             <p className="text-xs text-muted-foreground">ingredients unavailable</p>
                         </CardContent>
                     </Card>

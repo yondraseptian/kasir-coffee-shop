@@ -38,7 +38,7 @@ class ProductController extends Controller
             ];
         });
 
-        return inertia('products/products', [
+        return inertia('products/index', [
             'products' => $products,
         ]);
     }
@@ -48,7 +48,7 @@ class ProductController extends Controller
 
     public function create()
     {
-        return Inertia::render('products/product-create-form', [
+        return Inertia::render('products/create', [
             'categories' => Category::all()->toArray(),
             'ingredients' => Ingredient::with('unit')->get()->toArray(),
             'units' => Unit::all()->toArray(),
@@ -93,7 +93,7 @@ class ProductController extends Controller
             ]
             : null;
 
-        return Inertia::render('products/product-edit-form', [
+        return Inertia::render('products/edit', [
             'product' => $productData,
             'categories' => Category::all()->toArray(),
             'ingredients' => Ingredient::with('unit')->get()->toArray(),
@@ -107,7 +107,7 @@ class ProductController extends Controller
             'name' => 'required|string|max:255',
             'price' => 'required|numeric',
             'category_id' => 'required|exists:categories,id',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:10240',
             'ingredients' => 'required|array',
             'ingredients.*.ingredient_id' => 'required|exists:ingredients,id',
             'ingredients.*.quantity' => 'required|numeric',
@@ -139,7 +139,7 @@ class ProductController extends Controller
 
         $product->ingredients()->sync($ingredients);
 
-        return redirect()->route('products.create')->with('success', 'Product created successfully!');
+        return redirect()->route('products')->with('success', 'Product created successfully!');
     }
 
     // Menyimpan kategori baru
@@ -151,7 +151,7 @@ class ProductController extends Controller
 
         $category = Category::create(['name' => $request->name]);
 
-        return Inertia::render('products/product-create-form', [
+        return Inertia::render('products/create', [
             'categories' => Category::all()->toArray(),
             'ingredients' => Ingredient::all()->toArray(),
         ]);
@@ -199,7 +199,7 @@ class ProductController extends Controller
 
         $product->ingredients()->sync($ingredients);
 
-        return redirect()->route('products.edit', ['id' => $id])->with('success', 'Product updated successfully!')->with('success', 'Product updated successfully!');
+        return redirect()->route('products')->with('success', 'Product updated successfully!')->with('success', 'Product updated successfully!');
     }
 
 

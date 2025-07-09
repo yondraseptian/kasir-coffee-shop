@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::table('ingredients', function (Blueprint $table) {
             $table->dropColumn('unit');
-            $table->foreignId('unit_id')->nullable()->after('stock')->constrained('units')->onDelete('cascade');
+            $table->foreignId('unit_id')->nullable()->after('name')->constrained('units')->onDelete('cascade');
         });
 
         Schema::table('product_ingredient', function (Blueprint $table) {

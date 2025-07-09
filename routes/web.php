@@ -1,8 +1,14 @@
 <?php
 
 use App\Http\Controllers\CashierController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\IngredientController;
+use App\Http\Controllers\IngredientStockInController;
+use App\Http\Controllers\IngredientStockOutController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\TransactionController;
+use App\Models\Ingredient;
+use App\Models\IngredientStockIn;
 use App\Models\Product;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -12,9 +18,8 @@ Route::get('/', function () {
 })->name('home');
 
 Route::middleware(['auth', 'verified'])->group(function () {
-    Route::get('dashboard', function () {
-        return Inertia::render('dashboard');
-    })->name('dashboard');
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+
 
     Route::get('products', [ProductController::class, 'index'])->name('products');
     Route::get('/products/create', [ProductController::class, 'create'])->name('products.create');
@@ -30,6 +35,19 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/ingredients/{id}/edit', [IngredientController::class, 'edit'])->name('ingredients.edit');
     Route::put('/ingredients/{id}', [IngredientController::class, 'update'])->name('ingredients.update');
     Route::delete('/ingredients/{id}', [IngredientController::class, 'destroy'])->name('ingredients.destroy');
+
+    //stock in
+    Route::get('/ingredients/stock/create',[IngredientStockInController::class, 'create'])->name('stockIn.create');
+    Route::post('/ingredients/stock-in',[IngredientStockInController::class, 'store'])->name('stockIn.store');
+    
+    //stock out
+    Route::get('/ingredients/stock-out/create',[IngredientStockOutController::class, 'create'])->name('stockOut.create');
+    Route::post('/ingredients/stock-out',[IngredientStockOutController::class, 'store'])->name('stockOut.store');
+
+    Route::get('transactions', [TransactionController::class, 'index'])->name('transactions');
+    Route::get('transactions/{id}', [TransactionController::class, 'details'])->name('transactions.details');
+    Route::post('/transactions', [TransactionController::class, 'store'])->name('transactions.store');
+
 
     Route::get('cashier', [CashierController::class, 'index'])->name('cashier');
 });
