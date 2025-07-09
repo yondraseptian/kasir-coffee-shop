@@ -15,6 +15,8 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->string('unit');
+            $table->boolean('is_out_of_stock')->default(false); // Menandakan habis atau tidak
+            $table->decimal('stock_alert_threshold', 10, 2)->default(0); // Batas minimum agar muncul peringat
             $table->timestamps();
         });
     }

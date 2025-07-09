@@ -6,6 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { PageProps } from '@/types/inertia';
+import { Unit } from '@/types/ingredient';
 import { useForm, usePage } from '@inertiajs/react';
 import { Label } from '@radix-ui/react-label';
 import { useEffect, useState } from 'react';
@@ -13,7 +14,7 @@ import { useEffect, useState } from 'react';
 interface Ingredient {
   id: number;
   name: string;
-  stock: number;
+  stock_alert_threshold: number;
   unit_id: number;
   unit: {
     id: number;
@@ -22,11 +23,6 @@ interface Ingredient {
   };
 }
 
-interface Unit {
-  id: number;
-  name: string;
-  abbreviation: string;
-}
 
 interface IngredientEditFormProps {
   ingredient: Ingredient;
@@ -39,7 +35,7 @@ export default function IngredientEditForm({ ingredient, units }: IngredientEdit
 
   const { data, setData, errors, put, processing } = useForm({
     name: ingredient.name,
-    stock: ingredient.stock,
+    stock_alert_threshold: ingredient.stock_alert_threshold,
     unit_id: ingredient.unit_id,
   });
 
@@ -95,17 +91,17 @@ export default function IngredientEditForm({ ingredient, units }: IngredientEdit
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="stock">Stock</Label>
+                <Label htmlFor="stock_alert_threshold">Stock alert threshold</Label>
                 <Input
-                  id="stock"
+                  id="stock_alert_threshold"
                   type="number"
-                  value={data.stock}
-                  onChange={(e) => setData('stock', Number(e.target.value))}
+                  value={data.stock_alert_threshold}
+                  onChange={(e) => setData('stock_alert_threshold', Number(e.target.value))}
                   min="0"
                   step="0.01"
                   required
                 />
-                {errors.stock && <p className="text-sm text-red-600">{errors.stock}</p>}
+                {errors.stock_alert_threshold && <p className="text-sm text-red-600">{errors.stock_alert_threshold}</p>}
               </div>
 
               <div className="space-y-2">

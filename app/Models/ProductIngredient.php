@@ -7,10 +7,10 @@ use Illuminate\Database\Eloquent\Relations\Pivot;
 
 class ProductIngredient extends Model
 {
-     protected $table = 'product_ingredient';
+    protected $table = 'product_ingredient';
 
     protected $fillable = [
-        'product_id',        
+        'product_id',
         'ingredient_id',
         'quantity',
         'unit_id',
@@ -19,5 +19,10 @@ class ProductIngredient extends Model
     public function unit()
     {
         return $this->belongsTo(Unit::class, 'unit_id');
+    }
+
+    public function ingredient()
+    {
+        return $this->belongsTo(Ingredient::class);
     }
 }

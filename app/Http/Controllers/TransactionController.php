@@ -4,7 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Models\Product;
 use App\Models\Transaction;
+use App\Services\StockService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class TransactionController extends Controller
 {
@@ -54,5 +57,30 @@ class TransactionController extends Controller
                 }),
             ],
         ]);
+    }
+
+
+    public function store(Request $request)
+    {
+        DB::transaction(function () use ($request) {
+            $transaction = Transaction::create([
+                'user_id' => auth()->id(),
+                'total_price' => $request->total,
+                'payment_method' => 'cash', // atau sesuai kebutuhan
+            ]);
+
+            foreach ($request->products as $product) {
+                $transaction->transactionDetails()->create([
+                    'product_id' => $product['id'],
+                    'quantity' => $product['quantity'],
+                    'total_price' => $product['price'],
+                ]);
+
+                // Otomatis kurangi stok bahan berdasarkan produk
+                StockService::consumeIngredients($product['id'], $product['quantity']);
+            }
+        });
+
+        return redirect()->back()->with('success', 'Transaksi berhasil!');
     }
 }

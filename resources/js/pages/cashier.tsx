@@ -7,6 +7,7 @@ import { BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/react';
 import { ShoppingCart } from 'lucide-react';
 import { useState } from 'react';
+import { router } from '@inertiajs/react';
 
 interface Product {
     id: string;
@@ -23,7 +24,7 @@ interface CartItem extends Product {
 }
 
 export default function CashierPage({ products: initialProducts }: { products: Product[] }) {
-    const [products, setProducts] = useState<Product[]>(initialProducts);
+    const [products] = useState<Product[]>(initialProducts);
     const [cart, setCart] = useState<CartItem[]>([]);
     const [selectedCategory, setSelectedCategory] = useState<string>('All');
 
@@ -50,18 +51,29 @@ export default function CashierPage({ products: initialProducts }: { products: P
     };
 
     // Memproses pesanan, mengurangi stok produk dan menghapus keranjang
+
     const processOrder = () => {
-        setProducts((prev) =>
-            prev.map((product) => {
-                const cartItem = cart.find((item) => item.id === product.id);
-                if (cartItem) {
-                    return { ...product, stock: product.stock - cartItem.quantity };
-                }
-                return product;
-            }),
-        );
-        setCart([]); // Hapus keranjang setelah pesanan diproses
-        alert('Order processed successfully!');
+        if (cart.length === 0) return;
+
+        const payload = {
+            products: cart.map((item) => ({
+                id: item.id,
+                quantity: item.quantity,
+                price: item.price,
+            })),
+            total: getTotalPrice(),
+        };
+
+        router.post('/transactions', payload, {
+            onSuccess: () => {
+                setCart([]);
+                alert('Order processed successfully!');
+            },
+            onError: (errors) => {
+                console.error(errors);
+                alert('Failed to process order');
+            },
+        });
     };
 
     // Fungsi untuk memperbarui kuantitas produk di keranjang
@@ -71,9 +83,7 @@ export default function CashierPage({ products: initialProducts }: { products: P
             setCart((prev) => prev.filter((item) => item.id !== id));
         } else {
             // Jika kuantitas lebih besar dari 0, perbarui kuantitas produk
-            setCart((prev) =>
-                prev.map((item) => (item.id === id ? { ...item, quantity } : item)),
-            );
+            setCart((prev) => prev.map((item) => (item.id === id ? { ...item, quantity } : item)));
         }
     };
 

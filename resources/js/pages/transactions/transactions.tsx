@@ -54,12 +54,6 @@ export default function Transactions({ transactions }: { transactions: Transacti
                         </div>
                         <p className="text-muted-foreground">Manage your transactions</p>
                     </div>
-                    <Link href="/products/create">
-                        <Button className="gap-2">
-                            <Plus className="h-4 w-4" />
-                            Create Product
-                        </Button>
-                    </Link>
                 </div>
 
                 {/* Stats Cards

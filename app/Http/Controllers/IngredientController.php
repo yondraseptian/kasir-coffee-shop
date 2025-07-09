@@ -11,19 +11,18 @@ class IngredientController extends Controller
 {
     public function index()
     {
-        $ingredients = Ingredient::all();
-
-        $ingredients = $ingredients->map(function ($ingredient) {
-            return [
-                'id' => $ingredient->id,
-                'name' => $ingredient->name,
-                'unit' => $ingredient->unit->name,
-                'unit_id' => $ingredient->unit_id,
-            ];
-        });
+        $ingredients = Ingredient::with(['stockIns', 'stockOuts'])->get();
 
         return Inertia::render('ingredients/ingredients', [
-            'ingredients' => $ingredients,            
+            'ingredients' => $ingredients->map(function ($ingredient) {
+                return [
+                    'id' => $ingredient->id,
+                    'name' => $ingredient->name,
+                    'unit' => $ingredient->unit->name ?? null,
+                    'final_stock' => $ingredient->final_stock,
+                    'stock_alert_threshold' => $ingredient->stock_alert_threshold
+                ];
+            }),
         ]);
     }
 
@@ -40,6 +39,7 @@ class IngredientController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'unit_id' => 'required|exists:units,id',
+            'stock_alert_threshold' => 'nullable|numeric|min:0'
         ]);
 
         $ingredient = Ingredient::create([
@@ -77,11 +77,13 @@ class IngredientController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'unit_id' => 'required|exists:units,id',
+            'stock_alert_threshold' => 'nullable|numeric|min:0'
         ]);
 
         $ingredient = Ingredient::findOrFail($id);
         $ingredient->name = $request->name;
         $ingredient->unit_id = $request->unit_id;
+        $ingredient->stock_alert_threshold = $request->stock_alert_threshold;
         $ingredient->save();
 
         return redirect()->route('ingredients.edit', $ingredient->id)->with('success', 'Ingredient updated successfully!')->with('debug', 'flash shold be visible now');
