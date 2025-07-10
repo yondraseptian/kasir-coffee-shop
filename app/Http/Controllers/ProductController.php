@@ -30,7 +30,7 @@ class ProductController extends Controller
             });
 
             return [
-                'id' => $product->id,
+                'product_code' => $product->product_code,
                 'name' => $product->name,
                 'price' => $product->price,
                 'category_name' => $product->category->name,

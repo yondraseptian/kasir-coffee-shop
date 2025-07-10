@@ -6,6 +6,7 @@ use App\Http\Controllers\IngredientController;
 use App\Http\Controllers\IngredientStockInController;
 use App\Http\Controllers\IngredientStockOutController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\ProductImportController;
 use App\Http\Controllers\TransactionController;
 use App\Models\Ingredient;
 use App\Models\IngredientStockIn;
@@ -28,6 +29,17 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/products/{id}/edit', [ProductController::class, 'edit'])->name('products.edit');
     Route::put('/products/{id}', [ProductController::class, 'update'])->name('products.update');
     Route::delete('/products/{id}', [ProductController::class, 'destroy'])->name('products.destroy');
+
+    //import file product
+    Route::get('/products/form-import', function(){
+        return Inertia::render('products/import-products');
+    })->name('product.import');
+    Route::post('/products/import', [ProductImportController::class, 'import'])->name('products.import');
+    Route::get('/products/export', [ProductImportController::class, 'export'])->name('products.export');
+
+    Route::get('/ingredients/import', function(){
+        return Inertia::render('ingredients/import-ingredient');
+    })->name('product.import');
     
     Route::get('ingredients', [IngredientController::class, 'index'])->name('ingredients');
     Route::get('/ingredients/create', [IngredientController::class, 'create'])->name('ingredients.create');

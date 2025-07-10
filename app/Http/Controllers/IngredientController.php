@@ -16,7 +16,7 @@ class IngredientController extends Controller
         return Inertia::render('ingredients/ingredients', [
             'ingredients' => $ingredients->map(function ($ingredient) {
                 return [
-                    'id' => $ingredient->id,
+                    'ingredient_code' => $ingredient->ingredient_code,
                     'name' => $ingredient->name,
                     'unit' => $ingredient->unit->name ?? null,
                     'final_stock' => $ingredient->final_stock,
