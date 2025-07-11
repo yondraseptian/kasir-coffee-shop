@@ -8,6 +8,7 @@ use App\Http\Controllers\IngredientStockOutController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProductImportController;
 use App\Http\Controllers\TransactionController;
+use App\Http\Middleware\RoleMiddleware;
 use App\Models\Ingredient;
 use App\Models\IngredientStockIn;
 use App\Models\Product;
@@ -18,9 +19,9 @@ Route::get('/', function () {
     return Inertia::render('welcome');
 })->name('home');
 
-Route::middleware(['auth', 'verified'])->group(function () {
+Route::middleware(['auth', 'verified',RoleMiddleware::class.':admin'])->group(function () {
+    
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-
 
     Route::get('products', [ProductController::class, 'index'])->name('products');
     Route::get('/products/create', [ProductController::class, 'create'])->name('products.create');
@@ -61,6 +62,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/transactions', [TransactionController::class, 'store'])->name('transactions.store');
 
 
+    Route::get('cashier', [CashierController::class, 'index'])->name('cashier');
+});
+Route::middleware(['auth', 'verified',RoleMiddleware::class.':cashier'])->group(function () {
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('cashier', [CashierController::class, 'index'])->name('cashier');
 });
 

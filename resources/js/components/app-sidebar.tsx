@@ -3,9 +3,20 @@ import { NavMain } from '@/components/nav-main';
 import { NavUser } from '@/components/nav-user';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
 import { type NavItem } from '@/types';
-import { Link } from '@inertiajs/react';
+import { Link, usePage } from '@inertiajs/react';
 import { BadgeDollarSign, BookOpen, Coffee, Folder, LayoutGrid, Package, ShoppingBag } from 'lucide-react';
 import AppLogo from './app-logo';
+
+interface PageProps {
+    auth: {
+        user: {
+            id: number;
+            name: string;
+            email: string;
+            role: string;
+        };
+    };
+}
 
 const mainNavItems: NavItem[] = [
     {
@@ -49,6 +60,16 @@ const footerNavItems: NavItem[] = [
 ];
 
 export function AppSidebar() {
+     const { auth } = usePage<PageProps>().props;
+    const role = auth?.user?.role;
+
+    const filteredMainNavItems = mainNavItems.filter((item) => {
+        if (role === 'cashier') {
+            // hanya boleh lihat Dashboard dan Cashier
+            return ['/dashboard', '/cashier'].includes(item.href);
+        }
+        return true; // role lainnya bisa lihat semua
+    });
     return (
         <Sidebar collapsible="icon" variant="inset">
             <SidebarHeader>
@@ -64,7 +85,7 @@ export function AppSidebar() {
             </SidebarHeader>
 
             <SidebarContent>
-                <NavMain items={mainNavItems} />
+                <NavMain items={filteredMainNavItems} />
             </SidebarContent>
 
             <SidebarFooter>
