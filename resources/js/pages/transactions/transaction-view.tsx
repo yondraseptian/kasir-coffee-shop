@@ -78,7 +78,7 @@ export default function TransactionDetail() {
                 <Coffee className="w-5 h-5 text-amber-600" />
               </div>
               <div>
-                <CardTitle className="text-xl">Order With {transaction.user_name}</CardTitle>
+                <CardTitle className="text-xl">Order {transaction.customer_name}</CardTitle>
                 <CardDescription>Coffee shop order receipt</CardDescription>
               </div>
             </div>
@@ -95,13 +95,13 @@ export default function TransactionDetail() {
               <p className="text-3xl font-bold">{formatRupiah(transaction.total_price)}</p>
             </div>
             <div className="text-center md:text-left">
-              <p className="text-sm text-muted-foreground">Order ID</p>
+              <p className="text-sm text-muted-foreground">Bill Num</p>
               <div className="flex items-center gap-2">
-                <p className="font-mono text-sm">{transaction.id}</p>
+                <p className="font-mono text-sm">{transaction.bill_number}</p>
                 <Button
                   variant="ghost"
                   size="sm"
-                  onClick={() => copyToClipboard(transaction.id)}
+                  onClick={() => copyToClipboard(transaction.bill_number)}
                   className="h-6 w-6 p-0"
                 >
                   <Copy className="w-3 h-3" />

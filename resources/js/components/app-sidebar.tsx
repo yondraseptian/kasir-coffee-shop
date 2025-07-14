@@ -2,21 +2,12 @@ import { NavFooter } from '@/components/nav-footer';
 import { NavMain } from '@/components/nav-main';
 import { NavUser } from '@/components/nav-user';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
-import { type NavItem } from '@/types';
+import { PageProps, type NavItem } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
 import { BadgeDollarSign, BookOpen, Coffee, Folder, LayoutGrid, Package, ShoppingBag } from 'lucide-react';
 import AppLogo from './app-logo';
 
-interface PageProps {
-    auth: {
-        user: {
-            id: number;
-            name: string;
-            email: string;
-            role: string;
-        };
-    };
-}
+
 
 const mainNavItems: NavItem[] = [
     {

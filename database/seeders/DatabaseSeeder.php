@@ -25,6 +25,7 @@ class DatabaseSeeder extends Seeder
             UsersTableSeeder::class,
             CategoriesTableSeeder::class,
             ProductsTableSeeder::class,
+            ProductVariantsTableSeeder::class,
             UnitSeeder::class,
             UnitConversionSeeder::class,
             IngredientsTableSeeder::class,

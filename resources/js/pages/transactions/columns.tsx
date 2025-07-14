@@ -3,6 +3,7 @@
 import { Button } from '@/components/ui/button';
 import { ColumnDef } from '@tanstack/react-table';
 import { Link, router } from '@inertiajs/react';
+import { formatRupiah } from '@/lib/utils';
 
 export type Transaction = {
     transaction_id: string;
@@ -23,8 +24,8 @@ const handleDelete = (transaction: Transaction) => {
 
 export const columns: ColumnDef<Transaction>[] = [
     {
-        accessorKey: 'transaction_id',
-        header: 'ID',
+        accessorKey: 'bill_number',
+        header: 'Bill Number',
     },
     {
         accessorKey: 'user_name',
@@ -41,7 +42,7 @@ export const columns: ColumnDef<Transaction>[] = [
         header: 'Total Price',
         cell: ({ row }) => {
             const totalPrice = row.original.details.reduce((sum, item) => sum + item.total_price, 0);
-            return <span>Rp {totalPrice.toLocaleString()}</span>;
+            return <span>{formatRupiah(totalPrice)}</span>;
         },
     },
     {
@@ -52,7 +53,7 @@ export const columns: ColumnDef<Transaction>[] = [
                 <ul className="text-sm space-y-1">
                     {details.map((item, index) => (
                         <li key={index}>
-                            {item.product_name} - {item.quantity} x Rp{item.price.toLocaleString()} = Rp{item.total_price.toLocaleString()}
+                            {item.product_name} - {item.quantity} x {formatRupiah(item.price)} = {formatRupiah(item.total_price)}
                         </li>
                     ))}
                 </ul>

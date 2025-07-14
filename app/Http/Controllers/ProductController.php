@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Category;
 use App\Models\Ingredient;
 use App\Models\Product;
+use App\Models\ProductVariant;
 use App\Models\Unit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -14,27 +15,29 @@ class ProductController extends Controller
 {
     public function index()
     {
-        $units = \App\Models\Unit::all()->keyBy('id');
-
-        $products = Product::with(['category', 'ingredients'])->get();
+        $units = Unit::all()->keyBy('id');
+        $products = Product::with(['category', 'ingredients', 'variants'])->get();
 
         $products = $products->map(function ($product) use ($units) {
-            $ingredients = $product->ingredients->map(function ($ingredient) use ($units) {
-                $unitName = $units[$ingredient->pivot->unit_id]->abbreviation ?? 'Unknown';
-
-                return [
-                    'name' => $ingredient->name,
-                    'quantity' => $ingredient->pivot->quantity,
-                    'unit' => $unitName,
-                ];
-            });
-
             return [
                 'product_code' => $product->product_code,
                 'name' => $product->name,
-                'price' => $product->price,
                 'category_name' => $product->category->name,
-                'ingredients' => $ingredients,
+                'variants' => $product->variants->map(function ($variant) {
+                    return [
+                        'size' => $variant->size,
+                        'temperature' => $variant->temperature,
+                        'price' => $variant->price,
+                    ];
+                }),
+                'ingredients' => $product->ingredients->map(function ($ingredient) use ($units) {
+                    $unit = $units->get($ingredient->pivot->unit_id);
+                    return [
+                        'name' => $ingredient->name,
+                        'quantity' => $ingredient->pivot->quantity,
+                        'unit' => $unit?->abbreviation ?? '',
+                    ];
+                }),
             ];
         });
 
@@ -43,15 +46,12 @@ class ProductController extends Controller
         ]);
     }
 
-
-
-
     public function create()
     {
         return Inertia::render('products/create', [
-            'categories' => Category::all()->toArray(),
-            'ingredients' => Ingredient::with('unit')->get()->toArray(),
-            'units' => Unit::all()->toArray(),
+            'categories' => Category::all(),
+            'ingredients' => Ingredient::with('unit')->get(),
+            'units' => Unit::all(),
         ]);
     }
 
@@ -59,16 +59,13 @@ class ProductController extends Controller
     {
         $product = Product::with([
             'category:id,name',
-            'ingredients' => function ($query) {
-                $query->select('ingredients.id', 'name');
-            },
+            'ingredients',
+            'variants'
         ])->findOrFail($id);
 
-
-
-        // Transform ingredients and other necessary fields
-        $productData = $product->toArray();
         $units = Unit::all()->keyBy('id');
+
+        $productData = $product->toArray();
 
         $productData['ingredients'] = $product->ingredients->map(function ($ingredient) use ($units) {
             $unitId = $ingredient->pivot->unit_id;
@@ -86,18 +83,21 @@ class ProductController extends Controller
                 ],
             ];
         })->values()->toArray();
-        $productData['image'] = $product->image
-            ? [
-                'url' => asset('storage/' . $product->image),
-                'name' => basename($product->image),
-            ]
-            : null;
+
+        $productData['variants'] = $product->variants->map(function ($variant) {
+            return [
+                'id' => $variant->id,
+                'size' => $variant->size,
+                'temperature' => $variant->temperature,
+                'price' => $variant->price,
+            ];
+        })->toArray();
 
         return Inertia::render('products/edit', [
             'product' => $productData,
-            'categories' => Category::all()->toArray(),
-            'ingredients' => Ingredient::with('unit')->get()->toArray(),
-            'units' => Unit::all()->toArray(),
+            'categories' => Category::all(),
+            'ingredients' => Ingredient::with('unit')->get(),
+            'units' => Unit::all(),
         ]);
     }
 
@@ -105,90 +105,90 @@ class ProductController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
-            'price' => 'required|numeric',
             'category_id' => 'required|exists:categories,id',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:10240',
+            'variants' => 'required|array|min:1',
+            'variants.*.size' => 'required|string',
+            'variants.*.temperature' => 'required|string',
+            'variants.*.price' => 'required|numeric|min:0',
             'ingredients' => 'required|array',
             'ingredients.*.ingredient_id' => 'required|exists:ingredients,id',
-            'ingredients.*.quantity' => 'required|numeric',
+            'ingredients.*.quantity' => 'required|numeric|min:0',
             'ingredients.*.unit_id' => 'required|exists:units,id',
         ]);
 
-        // Mengunggah gambar produk (jika ada)
-        $imagePath = null;
-        if ($request->hasFile('image')) {
-            $imagePath = $request->file('image')->store('products', 'public');
-        }
+        $lastProduct = Product::latest('id')->first();
+        $lastId = $lastProduct ? $lastProduct->id : 0;
+        $nextId = $lastId + 1;
+        $productCode = 'PRD' . str_pad($nextId, 4, '0', STR_PAD_LEFT);
 
-        // Menyimpan data produk
         $product = Product::create([
+            'product_code' => $productCode,
             'name' => $request->name,
-            'price' => $request->price,
             'category_id' => $request->category_id,
-            'image' => $imagePath,
         ]);
 
-        // Menyimpan bahan-bahan produk (many-to-many relationship dengan pivot)
-        $ingredients = [];
+        // Save variants
+        foreach ($request->variants as $variant) {
+            $product->variants()->create([
+                'size' => $variant['size'],
+                'temperature' => $variant['temperature'],
+                'price' => $variant['price'],
+            ]);
+        }
+
+        // Sync ingredients
+        $syncIngredients = [];
         foreach ($request->ingredients as $ingredient) {
-            $ingredients[$ingredient['ingredient_id']] = [
+            $syncIngredients[$ingredient['ingredient_id']] = [
                 'quantity' => $ingredient['quantity'],
                 'unit_id' => $ingredient['unit_id'],
             ];
         }
-
-        $product->ingredients()->sync($ingredients);
+        $product->ingredients()->sync($syncIngredients);
 
         return redirect()->route('products')->with('success', 'Product created successfully!');
     }
-
-    // Menyimpan kategori baru
-    public function storeCategory(Request $request)
-    {
-        $request->validate([
-            'name' => 'required|string|max:255|unique:categories,name',
-        ]);
-
-        $category = Category::create(['name' => $request->name]);
-
-        return Inertia::render('products/create', [
-            'categories' => Category::all()->toArray(),
-            'ingredients' => Ingredient::all()->toArray(),
-        ]);
-    }
-
 
     public function update(Request $request, $id)
     {
         $request->validate([
             'name' => 'required|string|max:255',
-            'price' => 'required|numeric',
             'category_id' => 'required|exists:categories,id',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'variants' => 'required|array|min:1',
+            'variants.*.size' => 'required|string',
+            'variants.*.temperature' => 'required|string',
+            'variants.*.price' => 'required|numeric|min:0',
             'ingredients' => 'required|array',
             'ingredients.*.ingredient_id' => 'required|exists:ingredients,id',
-            'ingredients.*.quantity' => 'required|numeric',
+            'ingredients.*.quantity' => 'required|numeric|min:0',
             'ingredients.*.unit_id' => 'required|exists:units,id',
-
         ]);
 
-        $product = Product::with(['category', 'ingredients'])->findOrFail($id);
+        $product = Product::findOrFail($id);
 
-
-        // Update product information
-        $product->name = $request->name;
-        $product->price = $request->price;
-        $product->category_id = $request->category_id;
         if ($request->hasFile('image')) {
             if ($product->image && Storage::disk('public')->exists($product->image)) {
                 Storage::disk('public')->delete($product->image);
             }
-            $path = $request->file('image')->store('products', 'public');
-            $product->image = $path;
+            $product->image = $request->file('image')->store('products', 'public');
         }
-        $product->save();
 
-        // Sync ingredients (many-to-many relationship with pivot)
+        $product->update([
+            'name' => $request->name,
+            'category_id' => $request->category_id,
+        ]);
+
+        // Hapus dan buat ulang semua varian (bisa diganti soft update kalau mau)
+        $product->variants()->delete();
+        foreach ($request->variants as $variant) {
+            $product->variants()->create([
+                'size' => $variant['size'],
+                'temperature' => $variant['temperature'],
+                'price' => $variant['price'],
+            ]);
+        }
+
+        // Sync ingredients
         $ingredients = [];
         foreach ($request->ingredients as $ingredient) {
             $ingredients[$ingredient['ingredient_id']] = [
@@ -196,20 +196,22 @@ class ProductController extends Controller
                 'unit_id' => $ingredient['unit_id'],
             ];
         }
-
         $product->ingredients()->sync($ingredients);
 
-        return redirect()->route('products')->with('success', 'Product updated successfully!')->with('success', 'Product updated successfully!');
+        return redirect()->route('products')->with('success', 'Product updated successfully!');
     }
-
 
     public function destroy($id)
     {
         $product = Product::findOrFail($id);
+
         if ($product->image && Storage::disk('public')->exists($product->image)) {
             Storage::disk('public')->delete($product->image);
         }
+
+        $product->variants()->delete(); // hapus semua varian
         $product->delete();
+
         return redirect()->route('products')->with('success', 'Product deleted successfully!');
     }
 }

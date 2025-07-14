@@ -16,7 +16,19 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 export default function Dashboard() {
-    const { cogs, stockUsage, spoilage, sales, totalProducts, stockValue, spoilRate, efficiency } = usePage<PageProps & DashboardProps>().props;
+    const {
+        cogs,
+        stockUsage,
+        spoilage,
+        sales,
+        totalProducts,
+        stockValue,
+        spoilRate,
+        efficiency,
+        stockUsageDetails,
+        stockValueDetails,
+        ingredientStockAlerts,
+    } = usePage<PageProps & DashboardProps>().props;
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Dashboard" />
@@ -179,6 +191,91 @@ export default function Dashboard() {
                             <span className="text-xs text-gray-400">6 hours ago</span>
                         </div>
                     </div>
+                </div>
+            
+
+                <div>
+                    <h2 className="mt-8 mb-4 text-xl font-bold">Stock Usage Details</h2>
+                    <table className="w-full table-auto border-collapse border">
+                        <thead>
+                            <tr className="bg-gray-200">
+                                <th className="border px-4 py-2 text-left">Ingredient</th>
+                                <th className="border px-4 py-2 text-right">Used Quantity</th>
+                                <th className="border px-4 py-2 text-right">Price per Unit</th>
+                                <th className="border px-4 py-2 text-right">Total Usage Cost</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {stockUsageDetails.map((usage: any, index: number) => (
+                                <tr key={index}>
+                                    <td className="border px-4 py-2">{usage.ingredient_name}</td>
+                                    <td className="border px-4 py-2 text-right">{usage.used_quantity}</td>
+                                    <td className="border px-4 py-2 text-right">Rp {Number(usage.price_per_unit).toLocaleString()}</td>
+                                    <td className="border px-4 py-2 text-right font-semibold text-red-600">
+                                        Rp {Number(usage.total_usage_cost).toLocaleString()}
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+                <div>
+                    <h2 className="mt-10 mb-4 text-xl font-bold">Stock Value Details (Purchased)</h2>
+                    <table className="w-full table-auto border-collapse border text-sm">
+                        <thead className="bg-gray-200">
+                            <tr>
+                                <th className="border px-3 py-2 text-left">Date</th>
+                                <th className="border px-3 py-2 text-left">Ingredient</th>
+                                <th className="border px-3 py-2 text-right">Quantity Bought</th>
+                                <th className="border px-3 py-2 text-right">Price/Unit</th>
+                                <th className="border px-3 py-2 text-right">Total Value</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {stockValueDetails.map((item: any, i: number) => (
+                                <tr key={i}>
+                                    <td className="border px-3 py-2">{item.date}</td>       
+                                    <td className="border px-3 py-2">{item.ingredient_name}</td>
+                                    <td className="border px-3 py-2 text-right">{item.quantity}</td>
+                                    <td className="border px-3 py-2 text-right">Rp {Number(item.price_per_unit).toLocaleString()}</td>
+                                    <td className="border px-3 py-2 text-right font-semibold text-blue-700">
+                                        Rp {Number(item.total_value).toLocaleString()}
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+                <div className="mt-10">
+                    <h2 className="mb-2 text-lg font-bold">Ingredient Stock Alerts</h2>
+                    <table className="w-full table-auto border-collapse border text-sm">
+                        <thead className="bg-gray-100">
+                            <tr>
+                                <th className="border px-3 py-2 text-left">Ingredient</th>
+                                <th className="border px-3 py-2 text-right">Stock In</th>
+                                <th className="border px-3 py-2 text-right">Final Stock</th>
+                                <th className="border px-3 py-2 text-right">Alert Threshold</th>
+                                <th className="border px-3 py-2 text-center">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {ingredientStockAlerts.map((item: any, i: number) => (
+                                <tr key={i}>
+                                    <td className="border px-3 py-2">{item.name}</td>
+                                    <td className="border px-3 py-2 text-right">{item.stock_in}</td>
+                                    <td className="border px-3 py-2 text-right">{item.final_stock}</td>
+                                    <td className="border px-3 py-2 text-right">{item.stock_alert_threshold}</td>
+                                    <td
+                                        className={`border px-3 py-2 text-center font-semibold ${
+                                            item.is_below_threshold ? 'text-red-600' : 'text-green-600'
+                                        }`}
+                                    >
+                                        {item.is_below_threshold ? 'Low Stock' : 'OK'}
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </AppLayout>

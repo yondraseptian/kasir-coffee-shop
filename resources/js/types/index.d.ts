@@ -52,3 +52,33 @@ export interface DashboardProps {
   spoilRate: number;
   efficiency: number;
 }
+
+export interface PageProps {
+    auth: {
+        user: {
+            id: number;
+            name: string;
+            email: string;
+            role: string;
+        };
+    };
+}
+
+interface ReceiptProps {
+  transaction: {
+    billNum: string;
+    queueNum?: string;
+    cashier: string;
+    member: string;
+    salesMode: string;
+    createdAt: string;
+    items: {
+      name: string;
+      variant?: string;
+      price: number;
+      quantity: number;
+      subtotal: number;
+    }[];
+    total: number;
+  };
+}
