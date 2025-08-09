@@ -16,14 +16,14 @@ class ProductController extends Controller
     public function index()
     {
         $units = Unit::all()->keyBy('id');
-        $products = Product::with(['category', 'ingredients', 'variants'])->get();
+        $products = Product::with(['category', 'ingredients', 'productVariants'])->get();
 
         $products = $products->map(function ($product) use ($units) {
             return [
                 'product_code' => $product->product_code,
                 'name' => $product->name,
                 'category_name' => $product->category->name,
-                'variants' => $product->variants->map(function ($variant) {
+                'variants' => $product->productVariants->map(function ($variant) {
                     return [
                         'size' => $variant->size,
                         'temperature' => $variant->temperature,
@@ -60,7 +60,7 @@ class ProductController extends Controller
         $product = Product::with([
             'category:id,name',
             'ingredients',
-            'variants'
+            'productVariants'
         ])->findOrFail($id);
 
         $units = Unit::all()->keyBy('id');
@@ -84,7 +84,7 @@ class ProductController extends Controller
             ];
         })->values()->toArray();
 
-        $productData['variants'] = $product->variants->map(function ($variant) {
+        $productData['variants'] = $product->productVariants->map(function ($variant) {
             return [
                 'id' => $variant->id,
                 'size' => $variant->size,
@@ -129,7 +129,7 @@ class ProductController extends Controller
 
         // Save variants
         foreach ($request->variants as $variant) {
-            $product->variants()->create([
+            $product->productVariants()->create([
                 'size' => $variant['size'],
                 'temperature' => $variant['temperature'],
                 'price' => $variant['price'],
@@ -179,9 +179,9 @@ class ProductController extends Controller
         ]);
 
         // Hapus dan buat ulang semua varian (bisa diganti soft update kalau mau)
-        $product->variants()->delete();
+        $product->productVariants()->delete();
         foreach ($request->variants as $variant) {
-            $product->variants()->create([
+            $product->productVariants()->create([
                 'size' => $variant['size'],
                 'temperature' => $variant['temperature'],
                 'price' => $variant['price'],
@@ -209,7 +209,7 @@ class ProductController extends Controller
             Storage::disk('public')->delete($product->image);
         }
 
-        $product->variants()->delete(); // hapus semua varian
+        $product->productVariants()->delete(); // hapus semua varian
         $product->delete();
 
         return redirect()->route('products')->with('success', 'Product deleted successfully!');

@@ -10,7 +10,7 @@ export const Receipt: React.FC<ReceiptProps> = ({ transaction }) => {
     return (
         <div className="receipt-print mx-auto max-w-sm bg-white p-4 font-mono text-sm shadow-lg print:mx-0 print:max-w-none print:p-0 print:shadow-none">
             <div className="mb-2 text-center text-lg font-bold">RECEIPT</div>
-            <div className="mb-4 text-center text-base">Djournal, Pakuwon Mall Yogya</div>
+            <div className="mb-4 text-center text-base">yoji coffee</div>
 
             <hr className="my-2 border-dashed border-gray-400" />
 
