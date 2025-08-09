@@ -24,6 +24,10 @@ const handleDelete = (Ingredients: Ingredient) => {
 
 export const columns: ColumnDef<Ingredient>[] = [
     {
+        accessorKey: 'ingredient_code',
+        header: 'code',
+    },
+    {
         accessorKey: 'name',
         header: 'name',
     },

@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('ingredients', function (Blueprint $table) {
             $table->id();
+            $table->string('ingredient_code');
             $table->string('name');
             $table->string('unit');
             $table->boolean('is_out_of_stock')->default(false); // Menandakan habis atau tidak

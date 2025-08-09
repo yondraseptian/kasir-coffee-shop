@@ -15,8 +15,13 @@ return new class extends Migration
             $table->id();
             $table->foreignId('transaction_id')->constrained()->onDelete('cascade');
             $table->foreignId('product_id')->constrained()->onDelete('cascade');
+            $table->string('product_name');
+            $table->string('size')->nullable();
+            $table->string('temperature')->nullable();
+            $table->decimal('unit_price', 15, 2);
             $table->integer('quantity');
-            $table->decimal('total_price', 15, 2);
+            $table->decimal('discount', 15, 2)->default(0);
+            $table->decimal('subtotal', 15, 2);
             $table->timestamps();
         });
     }

@@ -16,7 +16,7 @@ class IngredientController extends Controller
         return Inertia::render('ingredients/ingredients', [
             'ingredients' => $ingredients->map(function ($ingredient) {
                 return [
-                    'id' => $ingredient->id,
+                    'ingredient_code' => $ingredient->ingredient_code,
                     'name' => $ingredient->name,
                     'unit' => $ingredient->unit->name ?? null,
                     'final_stock' => $ingredient->final_stock,
@@ -36,13 +36,20 @@ class IngredientController extends Controller
 
     public function store(Request $request)
     {
+        
         $request->validate([
             'name' => 'required|string|max:255',
             'unit_id' => 'required|exists:units,id',
             'stock_alert_threshold' => 'nullable|numeric|min:0'
         ]);
 
+        $lastIngredient = Ingredient::latest('id')->first();
+        $lastId = $lastIngredient ? $lastIngredient->id : 0;
+        $nextId = $lastId + 1;
+        $ingredientCode = 'ING' . str_pad($nextId, 4, '0', STR_PAD_LEFT);
+
         $ingredient = Ingredient::create([
+            'ingredient_code' => $ingredientCode,
             'name' => $request->name,
             'unit_id' => $request->unit_id,
         ]);

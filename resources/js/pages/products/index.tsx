@@ -1,5 +1,6 @@
 'use client';
 
+import { AlertMessage } from '@/components/alert-message';
 import { DataTable } from '@/components/data-table';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -7,10 +8,9 @@ import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
 import { PageProps } from '@/types/inertia';
 import { Head, Link, usePage } from '@inertiajs/react';
-import { Package, Plus } from 'lucide-react';
+import { Download, Import, Package, Plus } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { columns, Product } from './columns';
-import { AlertMessage } from '@/components/alert-message';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -100,9 +100,24 @@ export default function Products({ products }: { products: Product[] }) {
 
                 {/* Data Table */}
                 <Card>
-                    <CardHeader>
-                        <CardTitle>Product Catalog</CardTitle>
-                        <CardDescription>View and manage all your products in one place</CardDescription>
+                    <CardHeader className="flex flex-row justify-between">
+                        <div>
+                            <CardTitle>Product Catalog</CardTitle>
+                            <CardDescription>View and manage all your products in one place</CardDescription>
+                        </div>
+                        <div className="flex gap-2">
+                            <Link href={'products/form-import'}>
+                                <Button variant={'outline'}>
+                                    <Import />
+                                    import
+                                </Button>
+                            </Link>
+                            <a href="/products/export" target="_blank" rel="noopener noreferrer">
+                                <Button variant="outline">
+                                    <Download /> Export
+                                </Button>
+                            </a>
+                        </div>
                     </CardHeader>
                     <CardContent className="p-4">
                         <DataTable columns={columns} data={data} />

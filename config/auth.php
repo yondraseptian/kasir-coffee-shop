@@ -40,6 +40,11 @@ return [
             'driver' => 'session',
             'provider' => 'users',
         ],
+
+        'admin' => [ // ⬅️ tambahkan ini
+            'driver' => 'session',
+            'provider' => 'admins', // pastikan provider ini juga ada di bawah
+        ],
     ],
 
     /*
@@ -60,16 +65,16 @@ return [
     */
 
     'providers' => [
-        'users' => [
-            'driver' => 'eloquent',
-            'model' => env('AUTH_MODEL', App\Models\User::class),
-        ],
-
-        // 'users' => [
-        //     'driver' => 'database',
-        //     'table' => 'users',
-        // ],
+    'users' => [
+        'driver' => 'eloquent',
+        'model' => App\Models\User::class,
     ],
+
+    'admins' => [ // ⬅️ tambahkan ini juga
+        'driver' => 'eloquent',
+        'model' => App\Models\User::class, // sesuaikan jika kamu pakai model Admin
+    ],
+],
 
     /*
     |--------------------------------------------------------------------------

@@ -46,7 +46,7 @@ export default function ForgotPassword({ status }: { status?: string }) {
                     </div>
 
                     <div className="my-6 flex items-center justify-start">
-                        <Button className="w-full" disabled={processing}>
+                        <Button className="w-full h-12 bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 text-white font-medium rounded-lg transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98]" disabled={processing}>
                             {processing && <LoaderCircle className="h-4 w-4 animate-spin" />}
                             Email password reset link
                         </Button>
@@ -55,7 +55,7 @@ export default function ForgotPassword({ status }: { status?: string }) {
 
                 <div className="space-x-1 text-center text-sm text-muted-foreground">
                     <span>Or, return to</span>
-                    <TextLink href={route('login')}>log in</TextLink>
+                    <TextLink className="text-amber-600 hover:text-amber-700 font-medium" href={route('login')}>log in</TextLink>
                 </div>
             </div>
         </AuthLayout>

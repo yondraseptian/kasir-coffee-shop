@@ -8,6 +8,7 @@ use App\Services\StockService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Inertia\Inertia;
 
 class TransactionController extends Controller
 {
@@ -19,13 +20,14 @@ class TransactionController extends Controller
             ->map(function ($transaction) {
                 return [
                     'transaction_id' => $transaction->id,
+                    'bill_number' => $transaction->bill_number,
                     'user_name' => $transaction->user->name,
                     'details' => $transaction->transactionDetails->map(function ($detail) {
                         return [
                             'product_name' => $detail->product->name,
                             'quantity' => $detail->quantity,
-                            'price' => $detail->product->price,
-                            'total_price' => $detail->quantity * $detail->product->price,
+                            'price' => $detail->unit_price,
+                            'total_price' => $detail->quantity * $detail->unit_price,
                         ];
                     }),
                 ];
@@ -34,6 +36,7 @@ class TransactionController extends Controller
         return inertia('transactions/transactions', [
             'transactions' => $transactions,
         ]);
+        // return dd($transactions);
     }
 
     public function details($id)
@@ -43,7 +46,9 @@ class TransactionController extends Controller
         return inertia('transactions/transaction-view', [
             'transaction' => [
                 'id' => $transaction->id,
+                'bill_number' => $transaction->bill_number,
                 'user_name' => $transaction->user->name,
+                'customer_name' => $transaction->customer_name,
                 'payment_method' => $transaction->payment_method,
                 'total_price' => $transaction->total_price,
                 'created_at' => $transaction->created_at,
@@ -51,8 +56,8 @@ class TransactionController extends Controller
                     return [
                         'product_name' => $detail->product->name,
                         'quantity' => $detail->quantity,
-                        'price' => $detail->product->price,
-                        'total_price' => $detail->quantity * $detail->product->price,
+                        'price' => $detail->unit_price,
+                        'total_price' => $detail->quantity * $detail->unit_price,
                     ];
                 }),
             ],
@@ -62,25 +67,69 @@ class TransactionController extends Controller
 
     public function store(Request $request)
     {
-        DB::transaction(function () use ($request) {
-            $transaction = Transaction::create([
-                'user_id' => auth()->id(),
-                'total_price' => $request->total,
-                'payment_method' => 'cash', // atau sesuai kebutuhan
-            ]);
-
-            foreach ($request->products as $product) {
-                $transaction->transactionDetails()->create([
-                    'product_id' => $product['id'],
-                    'quantity' => $product['quantity'],
-                    'total_price' => $product['price'],
+        try {
+            $transaction = DB::transaction(function () use ($request) {
+                // Buat transaksi, bill_number akan otomatis terisi oleh model
+                $transaction = Transaction::create([
+                    'user_id' => auth()->id(),
+                    'customer_name' => $request->customer_name,
+                    'sales_mode' => $request->sales_mode,
+                    'payment_method' => $request->payment_method,
+                    'total_price' => $request->total_price,
+                    'discount' => $request->discount ?? 0,
+                    'final_price' => $request->final_price,
+                    'note' => $request->note,
                 ]);
 
-                // Otomatis kurangi stok bahan berdasarkan produk
-                StockService::consumeIngredients($product['id'], $product['quantity']);
-            }
-        });
+                foreach ($request->products as $product) {
+                    $transaction->transactionDetails()->create([
+                        'product_id' => $product['id'],
+                        'product_name' => $product['name'],
+                        'size' => $product['size'] ?? null,
+                        'temperature' => $product['temperature'] ?? null,
+                        'unit_price' => $product['price'],
+                        'quantity' => $product['quantity'],
+                        'subtotal' => $product['price'] * $product['quantity'],
+                    ]);
 
-        return redirect()->back()->with('success', 'Transaksi berhasil!');
+                    // Kurangi stok bahan baku
+                    StockService::consumeIngredients($product['id'], $product['quantity']);
+                }
+
+                return $transaction;
+            });
+
+            $queueNum = $request->query('queue');
+
+            // Redirect ke halaman cetak struk
+            return redirect()->to("/cashier/{$transaction->id}/receipt?queue={$queueNum}");
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', $e->getMessage());
+        }
+    }
+
+    public function showReceipt(Transaction $transaction, Request $request)
+    {
+        $transaction = Transaction::with(['user', 'transactionDetails.product'])->findOrFail($transaction->id);
+        return Inertia::render('receiptPage', [
+            'transaction' => [
+                'billNum' => $transaction->bill_number,
+                'queueNum' => $request->query('queue'),
+                'cashier' => $transaction->user->name,
+                'member' => $transaction->customer_name,
+                'salesMode' => $transaction->payment_method,
+                'createdAt' => $transaction->created_at->format('Y-m-d H:i:s'),
+                'total' => $transaction->total_price,
+                'items' => $transaction->transactionDetails->map(function ($detail) {
+                    return [
+                        'name' => $detail->product->name,
+                        'quantity' => $detail->quantity,
+                        'price' => $detail->unit_price,
+                        'subtotal' => $detail->quantity * $detail->unit_price,
+                        'variant' => trim(($detail->size ?? '') . ' ' . ($detail->temperature ?? '')),
+                    ];
+                }),
+            ],
+        ]);
     }
 }
