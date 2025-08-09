@@ -1,6 +1,5 @@
 import TextLink from '@/components/text-link';
 import { Head } from '@inertiajs/react';
-import { Coffee } from 'lucide-react';
 import { type PropsWithChildren } from 'react';
 
 interface AuthLayoutProps {
@@ -15,7 +14,7 @@ export default function AuthSimpleLayout({ children, title, description }: Props
       <Head title={title} />
       <div className="min-h-screen flex">
         {/* Left Side - Branding */}
-        <div className="hidden lg:flex lg:w-1/2 lg:justify-center bg-gradient-to-br from-amber-600 via-orange-600 to-red-600 relative overflow-hidden">
+        <div className="hidden lg:flex lg:w-1/2 lg:justify-center bg-black relative overflow-hidden">
           {/* Background Pattern */}
           <div className="absolute inset-0 opacity-10">
             <div className="absolute top-10 left-10 w-32 h-32 rounded-full bg-white/20"></div>
@@ -28,9 +27,9 @@ export default function AuthSimpleLayout({ children, title, description }: Props
           <div className="relative z-10 flex flex-col justify-center items-center text-white p-12 text-center">
             <div className="mb-8 flex flex-col items-center">
               <div className="w-24 h-24 bg-white/20 rounded-full flex items-center justify-center mb-6 backdrop-blur-sm">
-                <Coffee className="w-12 h-12 text-white" />
+                <img src="/iconWhite.png" className="w-12 h-12" alt="" />
               </div>
-              <h1 className="text-4xl font-bold mb-4">BrewMaster Admin</h1>
+              <h1 className="text-4xl font-bold mb-4">Yoji Admin</h1>
               <p className="text-xl text-white/90 max-w-md">
                 Manage your coffee shop with ease. Track orders, inventory, and analytics all in one place.
               </p>
@@ -55,14 +54,14 @@ export default function AuthSimpleLayout({ children, title, description }: Props
         </div>
 
         {/* Right Side - Login Form */}
-        <div className="w-full lg:w-1/2 flex items-center justify-center p-8 bg-gradient-to-br from-amber-50 to-orange-50">
+        <div className="w-full lg:w-1/2 flex items-center justify-center p-8 bg-white">
           <div className="w-full max-w-md">
             {/* Mobile Logo */}
             <div className="lg:hidden text-center mb-8">
-              <div className="w-16 h-16 bg-gradient-to-br from-amber-500 to-orange-600 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Coffee className="w-8 h-8 text-white" />
+              <div className="w-16 h-16 bg-black rounded-full flex items-center justify-center mx-auto mb-4">
+                <img src="/iconWhite.png" className="w-12 h-12" alt="" />
               </div>
-              <h1 className="text-2xl font-bold text-amber-900">BrewMaster Admin</h1>
+              <h1 className="text-2xl font-bold text-black">YoJi Admin</h1>
             </div>
 
             {/* Status Message */}
@@ -84,7 +83,7 @@ export default function AuthSimpleLayout({ children, title, description }: Props
               <div className="mt-8 text-center">
                 <p className="text-sm text-gray-600">
                   Need help?{" "}
-                  <TextLink href="/support" className="text-amber-600 hover:text-amber-700 font-medium">
+                  <TextLink href="/support" className="text-black font-medium">
                     Contact Support
                   </TextLink>
                 </p>

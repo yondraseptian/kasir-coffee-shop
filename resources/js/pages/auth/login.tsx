@@ -73,7 +73,7 @@ export default function Login({ status, canResetPassword }: LoginProps) {
                             Password
                         </Label>
                         {canResetPassword && (
-                            <TextLink href="/forgot-password" className="text-sm font-medium text-amber-600 hover:text-amber-700" tabIndex={5}>
+                            <TextLink href="/forgot-password" className="text-sm font-medium text-black" tabIndex={5}>
                                 Forgot password?
                             </TextLink>
                         )}
@@ -120,7 +120,7 @@ export default function Login({ status, canResetPassword }: LoginProps) {
                 {/* Submit Button */}
                 <Button
                     type="submit"
-                    className="h-12 w-full transform rounded-lg bg-gradient-to-r from-amber-600 to-orange-600 font-medium text-white transition-all duration-200 hover:scale-[1.02] hover:from-amber-700 hover:to-orange-700 active:scale-[0.98]"
+                    className="h-12 w-full transform rounded-lg bg-black text-white transition-all duration-200 hover:scale-[1.02] hover:from-amber-700 hover:to-orange-700 active:scale-[0.98]"
                     tabIndex={4}
                     disabled={processing}
                 >
