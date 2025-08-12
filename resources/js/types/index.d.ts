@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { LucideIcon } from 'lucide-react';
 import type { Config } from 'ziggy-js';
 
@@ -41,16 +42,24 @@ export interface User {
     updated_at: string;
     [key: string]: unknown; // This allows for additional properties...
 }
-
+interface StockUsageDetail {
+    ingredient_name: string;
+    used_quantity: number;
+    price_per_unit: number;
+    total_usage_cost: number;
+}
 export interface DashboardProps {
-  cogs: number;
-  stockUsage: number;
-  spoilage: number;
-  sales: number;
-  totalProducts: number;
-  stockValue: number;
-  spoilRate: number;
-  efficiency: number;
+    cogs: number;
+    stockUsage: number;
+    spoilage: number;
+    sales: number;
+    totalProducts: number;
+    stockValue: number;
+    spoilRate: number;
+    efficiency: number;
+    stockUsageDetails: StockUsageDetail[]; 
+    stockValueDetails: any[];
+    ingredientStockAlerts: any[]; 
 }
 
 export interface PageProps {
@@ -65,20 +74,20 @@ export interface PageProps {
 }
 
 interface ReceiptProps {
-  transaction: {
-    billNum: string;
-    queueNum?: string;
-    cashier: string;
-    member: string;
-    salesMode: string;
-    createdAt: string;
-    items: {
-      name: string;
-      variant?: string;
-      price: number;
-      quantity: number;
-      subtotal: number;
-    }[];
-    total: number;
-  };
+    transaction: {
+        billNum: string;
+        queueNum?: string;
+        cashier: string;
+        member: string;
+        salesMode: string;
+        createdAt: string;
+        items: {
+            name: string;
+            variant?: string;
+            price: number;
+            quantity: number;
+            subtotal: number;
+        }[];
+        total: number;
+    };
 }
