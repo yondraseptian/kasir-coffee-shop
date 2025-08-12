@@ -12,7 +12,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { formatRupiah } from '@/lib/utils';
-import { Link, router } from '@inertiajs/react';
+import { Head, Link, router } from '@inertiajs/react';
 
 interface MenuItemData {
     id: string;
@@ -212,6 +212,8 @@ export default function CashierSystem({ products: initialProducts }: { products:
     };
 
     return (
+        <>
+         <Head title="Cashier" />
         <div className="flex h-screen flex-col overflow-hidden bg-gray-100">
             {/* Header Bar */}
             <div className="flex-shrink-0 border-b bg-white px-6 py-4 shadow-sm">
@@ -631,5 +633,6 @@ export default function CashierSystem({ products: initialProducts }: { products:
                 </DialogContent>
             </Dialog>
         </div>
+        </>
     );
 }
