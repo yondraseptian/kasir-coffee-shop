@@ -4,7 +4,7 @@ import { NavUser } from '@/components/nav-user';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
 import { PageProps, type NavItem } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
-import { BadgeDollarSign, BookOpen, Coffee, Folder, LayoutGrid, Package, ShoppingBag } from 'lucide-react';
+import { BadgeDollarSign, BookOpen, Coffee, Folder, LayoutGrid, Package, ShoppingBag, User2Icon } from 'lucide-react';
 import AppLogo from './app-logo';
 
 
@@ -34,6 +34,11 @@ const mainNavItems: NavItem[] = [
         title: 'transactions',
         href: '/transactions',
         icon: BadgeDollarSign,
+    },
+    {
+        title: 'users',
+        href: '/users',
+        icon: User2Icon,
     }
 ];
 
@@ -80,7 +85,7 @@ export function AppSidebar() {
             </SidebarContent>
 
             <SidebarFooter>
-                <NavFooter items={footerNavItems} className="mt-auto" />
+                {/* <NavFooter items={footerNavItems} className="mt-auto" /> */}
                 <NavUser />
             </SidebarFooter>
         </Sidebar>

@@ -36,7 +36,6 @@ class TransactionController extends Controller
         return inertia('transactions/transactions', [
             'transactions' => $transactions,
         ]);
-        // return dd($transactions);
     }
 
     public function details($id)

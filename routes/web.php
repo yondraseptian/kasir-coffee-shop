@@ -8,6 +8,7 @@ use App\Http\Controllers\IngredientStockOutController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProductImportController;
 use App\Http\Controllers\TransactionController;
+use App\Http\Controllers\UserController;
 use App\Http\Middleware\RoleMiddleware;
 use App\Models\Ingredient;
 use App\Models\IngredientStockIn;
@@ -60,6 +61,12 @@ Route::middleware(['auth', 'verified', RoleMiddleware::class . ':admin'])->group
     Route::get('transactions', [TransactionController::class, 'index'])->name('transactions');
     Route::get('transactions/{id}', [TransactionController::class, 'details'])->name('transactions.details');
     Route::post('/transactions', [TransactionController::class, 'store'])->name('transactions.store');
+
+    //users
+    Route::get('/users', [UserController::class, 'index'])->name('users');
+    Route::post('/users', [UserController::class, 'store'])->name('users.store');
+    Route::put('/users/{id}', [UserController::class, 'update'])->name('users.update');
+    Route::delete('/users/{id}', [UserController::class, 'destroy'])->name('users.destroy');
 });
 Route::middleware(['auth', 'verified', RoleMiddleware::class . ':admin,cashier'])->group(function () {
     Route::get('cashier', [CashierController::class, 'index'])->name('cashier');
