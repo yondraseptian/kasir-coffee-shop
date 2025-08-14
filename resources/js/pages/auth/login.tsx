@@ -40,7 +40,7 @@ export default function Login({ status, canResetPassword }: LoginProps) {
 
     return (
         <AuthLayout title="Login" description="Sign in to your account">
-            <Head title="Forgot password" />
+            <Head title="Login" />
             {status && <div className="mb-4 text-center text-sm font-medium text-green-600">{status}</div>}
             <form className="space-y-6" onSubmit={submit}>
                 {/* Email Field */}
