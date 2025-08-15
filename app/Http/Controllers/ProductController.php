@@ -20,6 +20,7 @@ class ProductController extends Controller
 
         $products = $products->map(function ($product) use ($units) {
             return [
+                'id' => $product->id,
                 'product_code' => $product->product_code,
                 'name' => $product->name,
                 'category_name' => $product->category->name,
@@ -49,52 +50,6 @@ class ProductController extends Controller
     public function create()
     {
         return Inertia::render('products/create', [
-            'categories' => Category::all(),
-            'ingredients' => Ingredient::with('unit')->get(),
-            'units' => Unit::all(),
-        ]);
-    }
-
-    public function edit($id)
-    {
-        $product = Product::with([
-            'category:id,name',
-            'ingredients',
-            'productVariants'
-        ])->findOrFail($id);
-
-        $units = Unit::all()->keyBy('id');
-
-        $productData = $product->toArray();
-
-        $productData['ingredients'] = $product->ingredients->map(function ($ingredient) use ($units) {
-            $unitId = $ingredient->pivot->unit_id;
-            $unit = $units->get($unitId);
-            return [
-                'ingredientId' => $ingredient->id,
-                'name' => $ingredient->name,
-                'quantity' => $ingredient->pivot->quantity,
-                'unit_id' => $unitId,
-                'unit' => $unit?->abbreviation ?? '',
-                'Unit' => [
-                    'id' => $unit?->id ?? 0,
-                    'name' => $unit?->name ?? '',
-                    'abbreviation' => $unit?->abbreviation ?? '',
-                ],
-            ];
-        })->values()->toArray();
-
-        $productData['variants'] = $product->productVariants->map(function ($variant) {
-            return [
-                'id' => $variant->id,
-                'size' => $variant->size,
-                'temperature' => $variant->temperature,
-                'price' => $variant->price,
-            ];
-        })->toArray();
-
-        return Inertia::render('products/edit', [
-            'product' => $productData,
             'categories' => Category::all(),
             'ingredients' => Ingredient::with('unit')->get(),
             'units' => Unit::all(),
@@ -149,6 +104,23 @@ class ProductController extends Controller
         return redirect()->route('products')->with('success', 'Product created successfully!');
     }
 
+    public function edit($id)
+    {
+        $product = Product::with(['category', 'ingredients', 'productVariants'])->findOrFail($id);
+
+        // Membaca kategori, bahan-bahan, dan satuan untuk dropdown
+        $categories = Category::all();
+        $ingredients = Ingredient::with('unit')->get();
+        $units = Unit::all();
+
+        return Inertia::render('products/edit', [
+            'product' => $product,
+            'categories' => $categories,
+            'ingredients' => $ingredients,
+            'units' => $units,
+        ]);
+    }
+
     public function update(Request $request, $id)
     {
         $request->validate([
@@ -165,41 +137,37 @@ class ProductController extends Controller
         ]);
 
         $product = Product::findOrFail($id);
-
-        if ($request->hasFile('image')) {
-            if ($product->image && Storage::disk('public')->exists($product->image)) {
-                Storage::disk('public')->delete($product->image);
-            }
-            $product->image = $request->file('image')->store('products', 'public');
-        }
-
         $product->update([
             'name' => $request->name,
             'category_id' => $request->category_id,
         ]);
 
-        // Hapus dan buat ulang semua varian (bisa diganti soft update kalau mau)
-        $product->productVariants()->delete();
+        // Update variants
         foreach ($request->variants as $variant) {
-            $product->productVariants()->create([
-                'size' => $variant['size'],
-                'temperature' => $variant['temperature'],
-                'price' => $variant['price'],
-            ]);
+            $product->productVariants()->updateOrCreate(
+                ['id' => $variant['id'] ?? null], // Use existing variant ID or create new one
+                [
+                    'size' => $variant['size'],
+                    'temperature' => $variant['temperature'],
+                    'price' => $variant['price'],
+                ]
+            );
         }
 
         // Sync ingredients
-        $ingredients = [];
+        $syncIngredients = [];
         foreach ($request->ingredients as $ingredient) {
-            $ingredients[$ingredient['ingredient_id']] = [
+            $syncIngredients[$ingredient['ingredient_id']] = [
                 'quantity' => $ingredient['quantity'],
                 'unit_id' => $ingredient['unit_id'],
             ];
         }
-        $product->ingredients()->sync($ingredients);
+        $product->ingredients()->sync($syncIngredients);
 
         return redirect()->route('products')->with('success', 'Product updated successfully!');
     }
+
+
 
     public function destroy($id)
     {
