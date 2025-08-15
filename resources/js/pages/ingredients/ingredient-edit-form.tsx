@@ -94,7 +94,7 @@ export default function IngredientEditForm({ ingredient, units }: IngredientEdit
                 <Label htmlFor="stock_alert_threshold">Stock alert threshold</Label>
                 <Input
                   id="stock_alert_threshold"
-                  type="number"
+                  type="text"
                   value={data.stock_alert_threshold}
                   onChange={(e) => setData('stock_alert_threshold', Number(e.target.value))}
                   min="0"

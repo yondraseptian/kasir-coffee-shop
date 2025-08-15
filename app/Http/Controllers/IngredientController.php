@@ -16,6 +16,7 @@ class IngredientController extends Controller
         return Inertia::render('ingredients/ingredients', [
             'ingredients' => $ingredients->map(function ($ingredient) {
                 return [
+                    'id' => $ingredient->id,
                     'ingredient_code' => $ingredient->ingredient_code,
                     'name' => $ingredient->name,
                     'unit' => $ingredient->unit->name ?? null,
@@ -66,6 +67,7 @@ class IngredientController extends Controller
             'id' => $ingredient->id,
             'name' => $ingredient->name,
             'unit_id' => $ingredient->unit_id,
+            'stock_alert_threshold' => $ingredient->stock_alert_threshold,
             'unit' => [
                 'id' => $ingredient->unit->id,
                 'name' => $ingredient->unit->name,
@@ -77,6 +79,7 @@ class IngredientController extends Controller
             'ingredient' => $ingredient,
             'units' => $units,
         ]);
+       
     }
 
     public function update(Request $request, $id)
