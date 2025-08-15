@@ -1,26 +1,29 @@
 'use client';
 
 import { Button } from '@/components/ui/button';
+import { formatRupiah } from '@/lib/utils';
 import { Link, router } from '@inertiajs/react';
 import { ColumnDef } from '@tanstack/react-table';
 
 // This type is used to define the shape of our data.
 // You can use a Zod schema here if you want.
 
-
 export type Product = {
     id: string;
     name: string;
     category_name: string;
     price: number;
+    variants: {
+        size: string;
+        temperature: string;
+        price: number;
+    }[];
     ingredients: {
         name: string;
         quantity: number;
         unit: string; // Nama unit, bukan unit_id
     }[];
 };
-
-
 
 const handleDelete = (product: Product) => {
     if (confirm(`Are you sure you want to delete "${product.name}"?`)) {
@@ -29,7 +32,10 @@ const handleDelete = (product: Product) => {
 };
 
 export const columns: ColumnDef<Product>[] = [
-    
+    {
+        accessorKey: 'id',
+        header: 'id',
+    },
     {
         accessorKey: 'product_code',
         header: 'product code',
@@ -43,8 +49,26 @@ export const columns: ColumnDef<Product>[] = [
         header: 'Category',
     },
     {
-        accessorKey: 'price',
-        header: 'Price',
+        accessorKey: 'variants',
+        header: 'Variants',
+        cell: ({ row }) => {
+            const variants = row.original.variants; 
+            return (
+                <div>
+                    {variants.length > 0 ? (
+                        <ul>
+                            {variants.map((variant, index) => (
+                                <li key={index}>
+                                    {variant.size} - {variant.temperature} - {formatRupiah(variant.price)}
+                                </li>
+                            ))}
+                        </ul>
+                    ) : (
+                        <span>No variants</span>
+                    )}
+                </div>
+            );
+        },
     },
     {
         accessorKey: 'ingredients',

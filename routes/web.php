@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\CashierController;
+use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\IngredientController;
 use App\Http\Controllers\IngredientStockInController;
@@ -27,10 +28,11 @@ Route::middleware(['auth', 'verified', RoleMiddleware::class . ':admin'])->group
     Route::get('products', [ProductController::class, 'index'])->name('products');
     Route::get('/products/create', [ProductController::class, 'create'])->name('products.create');
     Route::post('/products', [ProductController::class, 'store'])->name('products.store');
-    Route::post('categories', [ProductController::class, 'storeCategory'])->name('categories.store');
+    Route::post('categories', [CategoryController::class, 'store'])->name('categories.store');
     Route::get('/products/{id}/edit', [ProductController::class, 'edit'])->name('products.edit');
     Route::put('/products/{id}', [ProductController::class, 'update'])->name('products.update');
     Route::delete('/products/{id}', [ProductController::class, 'destroy'])->name('products.destroy');
+
 
     //import file product
     Route::get('/products/form-import', function () {

@@ -1,8 +1,8 @@
 'use client';
 
+import CreateCategory from '@/components/create-category';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -10,7 +10,7 @@ import { Separator } from '@/components/ui/separator';
 import AppLayout from '@/layouts/app-layout';
 import { BreadcrumbItem } from '@/types';
 import type { AvailableCategory, AvailableIngredient, AvailableUnit } from '@/types/product';
-import { router, usePage } from '@inertiajs/react';
+import { Head, router, usePage } from '@inertiajs/react';
 import { Plus, Trash2 } from 'lucide-react';
 import type React from 'react';
 import { useState } from 'react';
@@ -45,8 +45,6 @@ export default function ProductCreateForm() {
 
     const [name, setProductName] = useState('');
     const [selectedCategory, setSelectedCategory] = useState('');
-    const [newCategoryName, setNewCategoryName] = useState('');
-    const [isNewCategoryOpen, setIsNewCategoryOpen] = useState(false);
 
     const [ingredientList, setIngredientList] = useState<IngredientEntry[]>([{ id: '1', ingredient: '', quantity: '', unit: '' }]);
 
@@ -74,14 +72,6 @@ export default function ProductCreateForm() {
 
     const updateVariant = (id: string, field: keyof ProductVariant, value: string) => {
         setVariants((prev) => prev.map((v) => (v.id === id ? { ...v, [field]: value } : v)));
-    };
-
-    const handleCreateNewCategory = () => {
-        if (newCategoryName.trim()) {
-            setSelectedCategory(newCategoryName);
-            setNewCategoryName('');
-            setIsNewCategoryOpen(false);
-        }
     };
 
     const handleSubmit = (e: React.FormEvent) => {
@@ -122,6 +112,7 @@ export default function ProductCreateForm() {
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
+            <Head title="Create Product" />
             <div className="mx-auto max-w-4xl space-y-8 p-6">
                 <div className="space-y-2">
                     <h1 className="text-3xl font-bold">Add New Product</h1>
@@ -160,32 +151,7 @@ export default function ProductCreateForm() {
                                             ))}
                                         </SelectContent>
                                     </Select>
-                                    <Dialog open={isNewCategoryOpen} onOpenChange={setIsNewCategoryOpen}>
-                                        <DialogTrigger asChild>
-                                            <Button type="button" variant="outline">
-                                                <Plus className="mr-2 h-4 w-4" /> New
-                                            </Button>
-                                        </DialogTrigger>
-                                        <DialogContent>
-                                            <DialogHeader>
-                                                <DialogTitle>Create New Category</DialogTitle>
-                                            </DialogHeader>
-                                            <div className="space-y-4">
-                                                <div className="space-y-2">
-                                                    <Label>Category Name</Label>
-                                                    <Input value={newCategoryName} onChange={(e) => setNewCategoryName(e.target.value)} />
-                                                </div>
-                                                <div className="flex justify-end gap-2">
-                                                    <Button type="button" variant="outline" onClick={() => setIsNewCategoryOpen(false)}>
-                                                        Cancel
-                                                    </Button>
-                                                    <Button type="button" onClick={handleCreateNewCategory}>
-                                                        Create
-                                                    </Button>
-                                                </div>
-                                            </div>
-                                        </DialogContent>
-                                    </Dialog>
+                                    <CreateCategory />
                                 </div>
                             </div>
                         </CardContent>
