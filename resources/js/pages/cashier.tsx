@@ -227,7 +227,7 @@ export default function CashierSystem({ products: initialProducts }: { products:
                             <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-amber-400 to-orange-500">
                                 <Coffee className="h-4 w-4 text-white" />
                             </div>
-                            <h1 className="text-2xl font-bold text-gray-800">Coffee Shop POS</h1>
+                            <h1 className="text-2xl font-bold text-gray-800">Yoji Cashier</h1>
                             <Badge variant="outline" className="text-sm">
                                 {salesMode ? salesMode.toUpperCase() : 'SELECT MODE'}
                             </Badge>

@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
-import { CupLabel, Receipt } from '@/components/Receipt';
+import { ReceiptForCup } from '@/components/receiptForCup';
+import { Receipt } from '@/components/receipt';
 
 interface TransactionItem {
   name: string;
@@ -35,19 +36,7 @@ export default function ReceiptPage({ transaction }: { transaction: Transaction 
       <Receipt transaction={transaction} />
 
       {/* Cup Labels */}
-      {/* <div className="print:break-before-page" />
-      <div className="grid grid-cols-2 gap-4 print:grid-cols-1">
-        {transaction.items.map((item, i) => (
-        //   <CupLabel
-        //     key={i}
-        //     queue={transaction.queueNum || '-'}
-        //     customerName={transaction.member}
-        //     salesMode={transaction.salesMode}
-        //     productName={item.name}
-        //     variant={[item.size, item.temperature].filter(Boolean).join(' / ')}
-        //   />
-        ))}
-      </div> */}
+      <ReceiptForCup transaction={transaction} />
     </div>
   );
 }
